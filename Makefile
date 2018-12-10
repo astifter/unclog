@@ -2,12 +2,12 @@ LIBNAME=libunclog.so
 
 all: $(LIBNAME)
 
-$(LIBNAME): unclog.c
-	$(CC) -Wall -Wextra -pedantic $(CFLAGS) -shared -o $@ $<
+$(LIBNAME):
+	$(MAKE) -C src $@
 
 check: all
 	$(MAKE) -C tests $@
 
 clean:
 	$(MAKE) -C tests $@
-	rm -f $(LIBNAME)
+	$(MAKE) -C src $@
