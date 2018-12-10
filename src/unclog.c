@@ -1,16 +1,5 @@
 #include "unclog.h"
-
-typedef struct unclog_s {
-    const char* source;
-} unclog_t;
-
-#include <pthread.h>
-#include <stdlib.h>
-#include <string.h>
-
-typedef struct unclog_global_s {
-    size_t handles;
-} unclog_global_t;
+#include "unclog_int.h"
 
 static pthread_mutex_t unclog_mutex = PTHREAD_MUTEX_INITIALIZER;
 static unclog_global_t* unclog_global = NULL;
@@ -20,6 +9,7 @@ unclog_pub_t* unclog_open(const char* source) {
         pthread_mutex_lock(&unclog_mutex);
         if(unclog_global == NULL) {
             unclog_global = malloc(sizeof(unclog_global_t));
+            unclog_init(unclog_global);
         }
         pthread_mutex_unlock(&unclog_mutex);
     }
