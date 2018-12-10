@@ -1,7 +1,5 @@
-LIBNAME=libunclog.so
-
 $(LIBNAME): unclog.c unclog_init.c
-	$(CC) -Wall -Wextra -pedantic $(CFLAGS) -shared -fPIC -g -o $@ $^ -linih
+	$(CC) $(CFLAGS) -shared -o $@ $^ -linih
 
 clean:
 	rm -f $(LIBNAME)

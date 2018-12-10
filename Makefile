@@ -1,4 +1,5 @@
-LIBNAME=libunclog.so
+export LIBNAME:=libunclog.so
+export CFLAGS:=-Wall -Wextra -pedantic -fPIC -g $(CFLAGS)
 
 all: $(LIBNAME)
 
