@@ -8,6 +8,9 @@ $(LIBNAME):
 check: all
 	$(MAKE) -C tests $@
 
+gdb: all
+	$(MAKE) -C tests $@
+
 clean:
 	$(MAKE) -C tests $@
 	$(MAKE) -C src $@
