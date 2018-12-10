@@ -1,4 +1,3 @@
-#include "unclog.h"
 #include "unclog_int.h"
 
 static pthread_mutex_t unclog_mutex = PTHREAD_MUTEX_INITIALIZER;
