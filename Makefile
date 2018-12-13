@@ -10,7 +10,7 @@ build/bin/test1:
 	cd build && make VERBOSE=1
 
 check: all
-	cd build && make VERBOSE=1 test
+	cd build && make check
 
 format:
 	cd build && make VERBOSE=1 format
