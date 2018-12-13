@@ -18,3 +18,6 @@ clean:
 	$(MAKE) -C tests $@
 	$(MAKE) -C src $@
 	$(MAKE) -C inih clean
+
+format:
+	clang-format-3.8 -i -style=file $$(find src tests -name '*.c' -o -name '*.h')
