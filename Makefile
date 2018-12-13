@@ -7,10 +7,13 @@ build/Makefile: CMakeLists.txt src/CMakeLists.txt
 	cd build && cmake ..
 
 build/bin/test1:
-	cd build && make
+	cd build && make VERBOSE=1
 
 check: all
-	cd build && make test
+	cd build && make VERBOSE=1 test
+
+format:
+	cd build && make VERBOSE=1 format
 
 clean:
 	rm -rf build

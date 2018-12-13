@@ -9,4 +9,10 @@ add_subdirectory(inih)
 add_subdirectory(src)
 add_subdirectory(tests)
 
-#clang-format-3.8 -i -style=file $$(find src tests -name '*.c' -o -name '*.h')
+file(GLOB_RECURSE sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.c")
+file(GLOB_RECURSE headers RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.h")
+add_custom_target(format 
+	COMMAND clang-format-3.8 -i -style=file ${sources} ${headers} 
+	DEPENDS ${sources} ${headers}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
