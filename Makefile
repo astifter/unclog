@@ -1,23 +1,16 @@
-export LIBINIH_ROOT=$(PWD)/inih
-export LIBNAME:=libunclog.so
-export CFLAGS:=--std=c99 -Wall -Wextra -pedantic -fPIC -g -I$(LIBINIH_ROOT) -I$(PWD)/src -L$(LIBINIH_ROOT) -L$(PWD)/src $(CFLAGS) 
+all: build build/Makefile build/bin/test1
 
-all: check
+build:
+	mkdir build
 
-$(LIBNAME):
-	$(MAKE) -C inih
-	$(MAKE) -C src $@
+build/Makefile: CMakeLists.txt src/CMakeLists.txt
+	cd build && cmake ..
 
-check: $(LIBNAME)
-	$(MAKE) -C tests $@
+build/bin/test1:
+	cd build && make
 
-gdb: all
-	$(MAKE) -C tests $@
+check: all
+	cd build && make test
 
 clean:
-	$(MAKE) -C tests $@
-	$(MAKE) -C src $@
-	$(MAKE) -C inih clean
-
-format:
-	clang-format-3.8 -i -style=file $$(find src tests -name '*.c' -o -name '*.h')
+	rm -rf build

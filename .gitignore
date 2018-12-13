@@ -3,3 +3,5 @@
 /cscope.*out
 /.ide/
 /inih/
+*.sw[pq]
+/build/
