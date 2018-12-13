@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(unclog C)
 
-set(CMAKE_CFLAGS "--std=c90 -Wall -Wextra -pedantic -fPIC -g $ENV{CFLAGS}")
+set(CMAKE_C_FLAGS "--std=c90 -Wall -Wextra -pedantic -fPIC -g $ENV{CFLAGS}")
 
 add_subdirectory(inih)
 add_subdirectory(src)
