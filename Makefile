@@ -12,5 +12,7 @@ build/bin/test1:
 clean:
 	rm -rf build
 
+rebuild: clean all
+
 format check valgrind gdb: all
 	cd build && make VERBOSE=1 $@
