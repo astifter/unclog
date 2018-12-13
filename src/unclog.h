@@ -13,6 +13,7 @@ extern "C" {
 #define UNCLOG_LEVEL_INFO 600
 #define UNCLOG_LEVEL_DEBUG 400
 #define UNCLOG_LEVEL_TRACE 200
+#define UNCLOG_LEVEL_MINIMAL 0
 
 typedef struct unclog_t { int level; } unclog_t;
 
@@ -21,7 +22,10 @@ void unclog_log(unclog_t* handle, unsigned int level, const char* file, const ch
                 unsigned int line, const char* fmt, ...);
 void unclog_close(unclog_t* handle);
 
-#define UNCLOG_LEVEL_CUTOFF 0
+#ifndef UNCLOG_LEVEL_CUTOFF
+#define UNCLOG_LEVEL_CUTOFF UNCLOG_LEVEL_MINIMAL
+#endif
+
 #define UNCLOG(ha, le, fi, fu, li, ...)                                  \
     {                                                                    \
         if ((le) >= (UNCLOG_LEVEL_CUTOFF))                               \

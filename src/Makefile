@@ -1,4 +1,4 @@
-$(LIBNAME): unclog.c unclog_init.c
+$(LIBNAME): *.c
 	$(CC) $(CFLAGS) -shared -o $@ $^ -linih
 
 clean:
