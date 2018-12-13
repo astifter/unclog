@@ -13,20 +13,20 @@ static unclog_levels_t unclog_levels[] = {
     {600, "Info", 'I'},   {400, "Debug", 'D'},     {200, "Trace", 'T'},  {-1, NULL, '\0'},
 };
 
-void unclog_level_handler(void* target, const char* value) {
-    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
+int unclog_level_tolevel(const char* value) {
+    unclog_levels_t* l = unclog_levels;
+    for (; l->name != NULL; l++) {
         if (strcmp(l->name, value) == 0) {
-            *(unsigned int*)target = l->level;
-            return;
+            return l->level;
         }
     }
-    *(unsigned int*)target = UNCLOG_LEVEL_DEFAULT;
+    return UNCLOG_LEVEL_DEFAULT;
 }
 
 char unclog_level_tochar(int level) {
-    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
-		if (level >= l->level)
-			return l->shortname;
-	}
-	return '?';
+    unclog_levels_t* l = unclog_levels;
+    for (; l->name != NULL; l++) {
+        if (level >= l->level) return l->shortname;
+    }
+    return '?';
 }

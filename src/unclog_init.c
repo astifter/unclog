@@ -16,7 +16,7 @@ typedef struct unclog_ini_s {
 
 static void unclog_defaults_handler(void* target, const char* name, const char* value) {
     unclog_global_t* g = target;
-    if (MATCH(name, "Level")) unclog_level_handler(&g->level, value);
+    if (MATCH(name, "Level")) g->defaults.level = unclog_level_tolevel(value);
 }
 
 static unclog_ini_t unclog_config[] = {
@@ -24,9 +24,11 @@ static unclog_ini_t unclog_config[] = {
 };
 
 int unclog_ini_handler(void* user, const char* section, const char* name, const char* value) {
-    for (unclog_ini_t* c = unclog_config; c->section != NULL; c++) {
+    unclog_ini_t* c = unclog_config;
+    for (; c->section != NULL; c++) {
         if (strcmp(c->section, section) == 0) {
             c->handler(user, name, value);
+            return 0;
         }
     }
     return 0;

@@ -15,7 +15,10 @@ extern "C" {
 #define UNCLOG_LEVEL_TRACE 200
 #define UNCLOG_LEVEL_MINIMAL 0
 
-typedef struct unclog_t { int level; } unclog_t;
+typedef struct unclog_t {
+    int level; /* this is also used (overlayed) in unclog_source_t, make sure to change that when
+                * unclog_source_t is changed. */
+} unclog_t;
 
 unclog_t* unclog_open(const char* source);
 void unclog_log(unclog_t* handle, unsigned int level, const char* file, const char* func,

@@ -2,10 +2,10 @@
 
 #include "unclog_int.h"
 
-#include <pthread.h>
-#include <stdio.h>
-#include <stdarg.h>
 #include <limits.h>
+#include <pthread.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
 static unclog_global_t* unclog_global = NULL;
@@ -17,9 +17,8 @@ unclog_t* unclog_open(const char* source) {
         unclog_global = unclog_global_create();
     }
 
-    unclog_source_t* handle = unclog_source_create(source);
-    handle->next = unclog_global->sources;
-    unclog_global->sources = handle;
+    unclog_source_t* handle = unclog_source_create(&unclog_global->defaults, source);
+    unclog_global_source_add(unclog_global, handle);
 
     pthread_rwlock_unlock(&unclog_mutex);
 
@@ -33,15 +32,16 @@ unclog_t* unclog_open(const char* source) {
 void unclog_log(unclog_t* public_handle, unsigned int level, const char* file, const char* func,
                 unsigned int line, const char* fmt, ...) {
     GET_UNCLOG_HANDLE(public_handle);
-	char buffer[PATH_MAX] = {0};
+    char buffer[PATH_MAX] = {0};
 
-	(void)func;
-	sprintf(buffer, "<%c> %s: %s:%d %s\n", unclog_level_tochar(level), handle->source, file, line, fmt);
-		
-	va_list al;
-	va_start(al, fmt);
-	vfprintf(stderr, buffer, al);
-	va_end(al);
+    (void)func;
+    sprintf(buffer, "<%c> %s: %s:%d %s\n", unclog_level_tochar(level), handle->source, file, line,
+            fmt);
+
+    va_list al;
+    va_start(al, fmt);
+    vfprintf(stderr, buffer, al);
+    va_end(al);
 }
 
 void unclog_close(unclog_t* public_handle) {
@@ -49,25 +49,12 @@ void unclog_close(unclog_t* public_handle) {
 
     pthread_rwlock_wrlock(&unclog_mutex);
 
-    unclog_source_t* s = unclog_global->sources;
-    unclog_source_t* p = NULL;
-    while (s != NULL) {
-        if (s == handle) {
-            if (p == NULL) {
-                unclog_global->sources = s->next;
-            } else {
-                p->next = s->next;
-            }
-			unclog_source_destroy(s);
-            break;
-        }
-		p = s;
-		s = s->next;
-    }
+    unclog_global_source_remove(unclog_global, handle);
 
     if (unclog_global->sources == NULL) {
-		unclog_global_destroy(unclog_global);
-	}
+        unclog_global_destroy(unclog_global);
+        unclog_global = NULL;
+    }
 
     pthread_rwlock_unlock(&unclog_mutex);
 }
