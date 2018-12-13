@@ -2,12 +2,12 @@
 
 typedef struct unclog_value_s {
     const char* name;
-    void (*unclog_value_handler)(void* user, const char* value);
+    void (*handler)(void* user, const char* value);
 } unclog_value_t;
 
 typedef struct unclog_ini_s {
     const char* section;
-    unclog_value_t* values; 
+    void (*handler)(void* user, const char* name, const char* value);
 } unclog_ini_t;
 
 unclog_levels_t unclog_levels[] = {
@@ -25,6 +25,8 @@ static const char* unclog_ini_files[] = {
     "./unclog.ini", "/etc/unclog.ini", NULL,
 };
 
+#define MATCH(n, v) (strcmp(n, v) == 0)
+
 static void unclog_level_handler(void* target, const char* value) {
     for(unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
         if (strcmp(l->name, value) == 0) {
@@ -35,13 +37,14 @@ static void unclog_level_handler(void* target, const char* value) {
     *(unsigned int*)target = UNCLOG_LEVEL_DEFAULT;
 }
 
-static unclog_value_t unclog_config_defaults[] = {
-  { "Level", unclog_level_handler },
-  { NULL, NULL },
-};
+static void unclog_defaults_handler(void* target, const char* name, const char* value) {
+	unclog_global_t* g = target;
+	if(MATCH(name, "Level")) unclog_level_handler(&g->level, value);
+    return 0;
+}
 
 static unclog_ini_t unclog_config[] = {
-  { "Defaults", unclog_config_defaults },
+  { "Defaults", unclog_defaults_handler },
   { NULL, NULL },
 };
 
@@ -50,11 +53,7 @@ static int unclog_ini_handler(void* user, const char* section, const char* name,
     unclog_global_t* g = user;
     for(unclog_ini_t* c = unclog_config; c->section != NULL; c++) {
         if (strcmp(c->section, section) == 0) {
-            for(unclog_value_t* v = c->values; v->name != NULL; v++) {
-                if (strcmp(v->name, name) == 0) {
-                    v->unclog_value_handler(&g->level, value);
-                }
-            }
+			c->handler(user, name, value);
         }
     }
     return 0;

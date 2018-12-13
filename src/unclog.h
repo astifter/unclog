@@ -16,10 +16,8 @@ extern "C" {
 
 typedef struct unclog_s unclog_t;
 typedef struct unclog_pub_s {
-    union {
-        int level;
-        unclog_t* __internal;
-    };
+    int level;
+    unclog_t* __internal;
 } unclog_pub_t;
 
 unclog_pub_t* unclog_open(const char* source);

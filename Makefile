@@ -1,12 +1,14 @@
+export LIBINIH_ROOT=$(PWD)/inih
 export LIBNAME:=libunclog.so
-export CFLAGS:=-Wall -Wextra -pedantic -fPIC -g $(CFLAGS)
+export CFLAGS:=--std=c99 -Wall -Wextra -pedantic -fPIC -g -I$(LIBINIH_ROOT) -I$(PWD)/src -L$(LIBINIH_ROOT) -L$(PWD)/src $(CFLAGS) 
 
-all: $(LIBNAME)
+all: check
 
 $(LIBNAME):
+	$(MAKE) -C inih
 	$(MAKE) -C src $@
 
-check: all
+check: $(LIBNAME)
 	$(MAKE) -C tests $@
 
 gdb: all
@@ -15,3 +17,4 @@ gdb: all
 clean:
 	$(MAKE) -C tests $@
 	$(MAKE) -C src $@
+	$(MAKE) -C inih clean
