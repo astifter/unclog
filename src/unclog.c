@@ -17,8 +17,11 @@ unclog_t* unclog_open(const char* source) {
         unclog_global = unclog_global_create();
     }
 
-    unclog_source_t* handle = unclog_source_create(&unclog_global->defaults, source);
-    unclog_global_source_add(unclog_global, handle);
+    unclog_source_t* handle = unclog_global_source_get(unclog_global, source);
+    if (handle == NULL) {
+        handle = unclog_source_create(&unclog_global->defaults, source);
+        unclog_global_source_add(unclog_global, handle);
+    }
 
     pthread_rwlock_unlock(&unclog_mutex);
 

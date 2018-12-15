@@ -9,29 +9,26 @@ typedef struct unclog_levels_s {
 } unclog_levels_t;
 
 static unclog_levels_t unclog_levels[] = {
-	{ UNCLOG_LEVEL_FATAL, "Fatal", 'F' },
-	{ UNCLOG_LEVEL_CRITICAL, "Critical", 'C' },
-	{ UNCLOG_LEVEL_ERROR, "Error", 'E' },
-	{ UNCLOG_LEVEL_WARNING, "Warning", 'W' },
-	{ UNCLOG_LEVEL_INFO, "Info", 'I' },
-	{ UNCLOG_LEVEL_DEBUG, "Debug", 'D' },
-	{ UNCLOG_LEVEL_TRACE, "Trace", 'T' },
+    {UNCLOG_LEVEL_FATAL, "Fatal", 'F'}, {UNCLOG_LEVEL_CRITICAL, "Critical", 'C'},
+    {UNCLOG_LEVEL_ERROR, "Error", 'E'}, {UNCLOG_LEVEL_WARNING, "Warning", 'W'},
+    {UNCLOG_LEVEL_INFO, "Info", 'I'},   {UNCLOG_LEVEL_DEBUG, "Debug", 'D'},
+    {UNCLOG_LEVEL_TRACE, "Trace", 'T'}, {0, NULL, '\0'},
 };
 
 typedef struct unclog_details_s {
-	uint32_t option;
-	const char* name;
+    uint32_t option;
+    const char* name;
 } unclog_details_t;
 
-
 static unclog_details_t unclog_details[] = {
-	{ 0x00000001, "Time" },
-	{ 0x00000002, "Source" },
-	{ 0x00000004, "Location" },
-	{ 0x00000008, "File" },
-	{ 0x00000010, "Line" },
-	{ 0x00000020, "Message" },
-	{ -1, NULL },
+    {UNCLOG_OPT_LEVEL, "Level"},
+	{UNCLOG_OPT_TIMESTAMP, "Timestamp"},
+    {UNCLOG_OPT_SOURCE, "Source"},
+    {UNCLOG_OPT_LOCATION, "Location"},
+    {UNCLOG_OPT_FILE, "File"},
+    {UNCLOG_OPT_LINE, "Line"},
+    {UNCLOG_OPT_MESSAGE, "Message"},
+    {-1, NULL},
 };
 
 int unclog_level_tolevel(const char* value) {
@@ -61,11 +58,11 @@ char* unclog_level_tostr(int level) {
 }
 
 uint32_t unclog_details_todetail(const char* value) {
-	unclog_details_t* d = unclog_details;
-	for(; d->name != NULL; d++) {
-		if(strcmp(d->name, value) == 0) {
-			return d->option;
-		}
-	}
-	return 0;
+    unclog_details_t* d = unclog_details;
+    for (; d->name != NULL; d++) {
+        if (strcmp(d->name, value) == 0) {
+            return d->option;
+        }
+    }
+    return 0;
 }
