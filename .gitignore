@@ -5,3 +5,4 @@
 /inih/
 *.sw[pq]
 /build/
+/staging/
