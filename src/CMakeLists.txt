@@ -3,10 +3,10 @@ include_directories(${inih_INCLUDES})
 add_library(unclog SHARED
 	unclog.c
 	unclog_global.c
-  	unclog_init.c
+  	unclog_config.c
 	unclog_levels.c
 	unclog_source.c
-
+	unclog_sink.c
 	unclog.h
 	unclog_int.h
 )

@@ -1,19 +1,20 @@
 #pragma once
 
 #include <stddef.h>
+#include <limits.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define UNCLOG_LEVEL_FATAL 1400
-#define UNCLOG_LEVEL_CRITICAL 1200
-#define UNCLOG_LEVEL_ERROR 1000
+#define UNCLOG_LEVEL_MAXIMUM 0
+#define UNCLOG_LEVEL_FATAL 200
+#define UNCLOG_LEVEL_CRITICAL 400
+#define UNCLOG_LEVEL_ERROR 600
 #define UNCLOG_LEVEL_WARNING 800
-#define UNCLOG_LEVEL_INFO 600
-#define UNCLOG_LEVEL_DEBUG 400
-#define UNCLOG_LEVEL_TRACE 200
-#define UNCLOG_LEVEL_MINIMAL 0
+#define UNCLOG_LEVEL_INFO 1000
+#define UNCLOG_LEVEL_DEBUG 1200
+#define UNCLOG_LEVEL_TRACE 1400
 
 typedef struct unclog_t {
     int level; /* this is also used (overlayed) in unclog_source_t, make sure to change that when
@@ -26,13 +27,13 @@ void unclog_log(unclog_t* handle, unsigned int level, const char* file, const ch
 void unclog_close(unclog_t* handle);
 
 #ifndef UNCLOG_LEVEL_CUTOFF
-#define UNCLOG_LEVEL_CUTOFF UNCLOG_LEVEL_MINIMAL
+#define UNCLOG_LEVEL_CUTOFF INT_MAX
 #endif
 
 #define UNCLOG(ha, le, fi, fu, li, ...)                                  \
     {                                                                    \
-        if ((le) >= (UNCLOG_LEVEL_CUTOFF))                               \
-            if (((ha) != NULL) && ((le) >= (ha)->level))                 \
+        if ((le) <= (UNCLOG_LEVEL_CUTOFF))                               \
+            if (((ha) != NULL) && ((le) <= (ha)->level))                 \
                 unclog_log((ha), (le), (fi), (fu), (li), ##__VA_ARGS__); \
     }
 

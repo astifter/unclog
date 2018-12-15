@@ -8,6 +8,8 @@ int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
     unclog_t* l1 = unclog_open("source1");
+    fprintf(stderr,
+            "--------------------------------------------------------------------------------\n");
     UL_ERR(l1, "fritz: %d", 45);
     unclog_t* l2 = unclog_open("source2");
     UL_TRA(l2, "herbert");

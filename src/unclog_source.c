@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-unclog_source_t* unclog_source_create(unclog_defaults_t* defaults, const char* source) {
+unclog_source_t* unclog_source_create(unclog_values_t* defaults, const char* source) {
     unclog_source_t* handle = malloc(sizeof(unclog_source_t));
     handle->source = strdup(source);
-    handle->level = defaults->level;
+    handle->public.level = defaults->level;
     return handle;
 }
 
