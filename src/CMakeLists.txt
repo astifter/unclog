@@ -12,7 +12,7 @@ add_library(unclog SHARED
 )
 target_link_libraries(unclog pthread inih)
 
-install(TARGETS unclog DESTINATION lib)
-install(FILES unclog.h DESTINATION include)
+install(TARGETS unclog DESTINATION lib COMPONENT Main)
+install(FILES unclog.h DESTINATION include COMPONENT Main)
 
 set(unclog_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}" CACHE STRING "" FORCE)
