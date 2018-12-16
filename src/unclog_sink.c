@@ -25,14 +25,14 @@ void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* 
 }
 
 void unclog_sink_destroy(unclog_sink_t* sink) {
-	unclog_keyvalue_t* kv = sink->values;
-	while(kv != NULL) {
-		unclog_keyvalue_t* d = kv;
-		kv = kv->next;
-		free(d->key);
-		free(d->value);
-		free(d);
-	}
-	free(sink->sink);
-	free(sink);
+    unclog_keyvalue_t* kv = sink->values;
+    while (kv != NULL) {
+        unclog_keyvalue_t* d = kv;
+        kv = kv->next;
+        free(d->key);
+        free(d->value);
+        free(d);
+    }
+    free(sink->sink);
+    free(sink);
 }

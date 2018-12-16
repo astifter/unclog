@@ -3,8 +3,8 @@
 #include "unclog_int.h"
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MATCH(n, v) (strcmp(n, v) == 0)
 
@@ -13,7 +13,7 @@ static void unclog_level_handler(unclog_values_t* v, const char* value) {
 }
 
 static void unclog_options_handler(unclog_values_t* v, const char* value) {
-	char* buffer = strdup(value);
+    char* buffer = strdup(value);
     char* token_save;
     char* token = strtok_r(buffer, ",", &token_save);
     v->options = 0;
@@ -21,7 +21,7 @@ static void unclog_options_handler(unclog_values_t* v, const char* value) {
         v->options |= unclog_details_todetail(token);
         token = strtok_r(NULL, ",", &token_save);
     }
-	free(buffer);
+    free(buffer);
 }
 
 static int unclog_common_handler(unclog_values_t* v, const char* name, const char* value) {
@@ -39,7 +39,7 @@ static void unclog_defaults_handler(void* g, const char* name, const char* value
     unclog_global_t* global = g;
     if (unclog_common_handler(&global->defaults, name, value)) return;
     if (MATCH(name, "Sinks")) {
-		char* buffer = strdup(value);
+        char* buffer = strdup(value);
         char* token_save;
         char* token = strtok_r(buffer, ",", &token_save);
         while (token != NULL) {
@@ -47,7 +47,7 @@ static void unclog_defaults_handler(void* g, const char* name, const char* value
             unclog_global_sink_add(g, sink);
             token = strtok_r(NULL, ",", &token_save);
         }
-		free(buffer);
+        free(buffer);
     }
 }
 

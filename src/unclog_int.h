@@ -6,7 +6,7 @@
 
 typedef struct unclog_source_s {
     unclog_t public;
-	int active;
+    int active;
 
     char* source;
     struct unclog_source_s* next;

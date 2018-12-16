@@ -1,5 +1,5 @@
-default: check
-all: install
+default: valgrind
+all: install format valgrind
 
 build:
 	mkdir build
@@ -16,7 +16,7 @@ install: build/bin/test1
 clean:
 	rm -rf build staging
 
-rebuild: clean default
+rebuild: clean install
 
 format: build/Makefile
 	cd build && make VERBOSE=1 format

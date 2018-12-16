@@ -17,9 +17,7 @@ extern "C" {
 #define UNCLOG_LEVEL_TRACE 1400
 #define UNCLOG_LEVEL_MINIMUM INT_MAX
 
-typedef struct unclog_s {
-    int level;
-} unclog_t;
+typedef struct unclog_s { int level; } unclog_t;
 
 unclog_t* unclog_open(const char* source);
 void unclog_log(unclog_t* handle, unsigned int level, const char* file, const char* func,

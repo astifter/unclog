@@ -55,7 +55,7 @@ void unclog_close(unclog_t* public_handle) {
 
     handle->active--;
     int has_active_handles;
-    if(handle->active == 0) {
+    if (handle->active == 0) {
         has_active_handles = unclog_global_source_remove(unclog_global, handle);
     } else {
         has_active_handles = 1;

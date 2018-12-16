@@ -42,7 +42,7 @@ char unclog_level_tochar(int level) {
     for (; l->name != NULL; l++) {
         if (level <= l->level) return l->shortname;
     }
-    return '?';
+    return 'M';
 }
 
 const char* unclog_level_tostr(int level) {
