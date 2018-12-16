@@ -24,5 +24,8 @@ format: build/Makefile
 check: install
 	cd staging/tests && LD_LIBRARY_PATH=../lib ./test1
 
-valgrind gdb: install
+gdb: install
 	cd staging/tests && LD_LIBRARY_PATH=../lib $@ ./test1
+
+valgrind: install
+	cd staging/tests && LD_LIBRARY_PATH=../lib $@ --leak-check=full --track-origins=yes ./test1

@@ -40,14 +40,30 @@ unclog_global_t* unclog_global_create(void) {
     return g;
 }
 
-void unclog_global_destroy(unclog_global_t* global) { free(global); }
+void unclog_global_destroy(unclog_global_t* global) { 
+	unclog_sink_t* sink = global->sinks;
+	while(sink != NULL) {
+		unclog_sink_t* d = sink;
+		sink = sink->next;
+		unclog_sink_destroy(d);
+	}
+	unclog_source_t* source = global->sources;
+	while(source != NULL) {
+		unclog_source_t* d = source;
+		source = source->next;
+		unclog_source_destroy(d);
+	}
+
+	free(global); 
+}
 
 void unclog_global_source_add(unclog_global_t* global, unclog_source_t* handle) {
     handle->next = global->sources;
     global->sources = handle;
 }
 
-void unclog_global_source_remove(unclog_global_t* global, unclog_source_t* handle) {
+int unclog_global_source_remove(unclog_global_t* global, unclog_source_t* handle) {
+	int has_active_handles = 0;
     unclog_source_t* s = global->sources;
     unclog_source_t* p = NULL;
     while (s != NULL) {
@@ -57,12 +73,16 @@ void unclog_global_source_remove(unclog_global_t* global, unclog_source_t* handl
             } else {
                 p->next = s->next;
             }
-            unclog_source_destroy(s);
-            break;
-        }
-        p = s;
-        s = s->next;
+			unclog_source_t* d = s;
+			s = s->next;
+            unclog_source_destroy(d);
+        } else {
+			if (s->active == 1) has_active_handles = 1;
+        	p = s;
+        	s = s->next;
+		}
     }
+	return has_active_handles;
 }
 
 void unclog_global_sink_add(unclog_global_t* global, unclog_sink_t* handle) {

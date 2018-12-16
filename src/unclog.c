@@ -22,6 +22,7 @@ unclog_t* unclog_open(const char* source) {
         handle = unclog_source_create(&unclog_global->defaults, source);
         unclog_global_source_add(unclog_global, handle);
     }
+    handle->active++;
 
     pthread_rwlock_unlock(&unclog_mutex);
 
@@ -52,9 +53,15 @@ void unclog_close(unclog_t* public_handle) {
 
     pthread_rwlock_wrlock(&unclog_mutex);
 
-    unclog_global_source_remove(unclog_global, handle);
+    handle->active--;
+    int has_active_handles;
+    if(handle->active == 0) {
+        has_active_handles = unclog_global_source_remove(unclog_global, handle);
+    } else {
+        has_active_handles = 1;
+    }
 
-    if (unclog_global->sources == NULL) {
+    if (!has_active_handles) {
         unclog_global_destroy(unclog_global);
         unclog_global = NULL;
     }

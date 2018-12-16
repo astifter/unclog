@@ -6,6 +6,7 @@
 
 typedef struct unclog_source_s {
     unclog_t public;
+	int active;
 
     char* source;
     struct unclog_source_s* next;
@@ -18,7 +19,8 @@ typedef struct unclog_source_s {
 #define UNCLOG_OPT_LINE 0x00000010
 #define UNCLOG_OPT_MESSAGE 0x00000020
 #define UNCLOG_OPT_LEVEL 0x00000040
-#define UNCLOG_OPT_DEFAULTS (UNCLOG_OPT_LEVEL | UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE)
+#define UNCLOG_OPT_DEFAULTS \
+    (UNCLOG_OPT_LEVEL | UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE)
 
 typedef struct unclog_keyvalue_s {
     char* key;
@@ -53,7 +55,7 @@ int unclog_ini_handler(void* user, const char* section, const char* name, const 
 unclog_global_t* unclog_global_create(void);
 void unclog_global_destroy(unclog_global_t* global);
 void unclog_global_source_add(unclog_global_t* global, unclog_source_t* source);
-void unclog_global_source_remove(unclog_global_t* global, unclog_source_t* source);
+int unclog_global_source_remove(unclog_global_t* global, unclog_source_t* source);
 void unclog_global_sink_add(unclog_global_t* global, unclog_sink_t* handle);
 unclog_sink_t* unclog_global_sink_get(unclog_global_t* global, const char* sink);
 unclog_source_t* unclog_global_source_get(unclog_global_t* global, const char* source);
@@ -67,5 +69,5 @@ void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* 
 
 int unclog_level_tolevel(const char* value);
 char unclog_level_tochar(int level);
-char* unclog_level_tostr(int level);
+const char* unclog_level_tostr(int level);
 uint32_t unclog_details_todetail(const char* value);

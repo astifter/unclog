@@ -15,10 +15,10 @@ extern "C" {
 #define UNCLOG_LEVEL_INFO 1000
 #define UNCLOG_LEVEL_DEBUG 1200
 #define UNCLOG_LEVEL_TRACE 1400
+#define UNCLOG_LEVEL_MINIMUM INT_MAX
 
-typedef struct unclog_t {
-    int level; /* this is also used (overlayed) in unclog_source_t, make sure to change that when
-                * unclog_source_t is changed. */
+typedef struct unclog_s {
+    int level;
 } unclog_t;
 
 unclog_t* unclog_open(const char* source);
@@ -27,7 +27,7 @@ void unclog_log(unclog_t* handle, unsigned int level, const char* file, const ch
 void unclog_close(unclog_t* handle);
 
 #ifndef UNCLOG_LEVEL_CUTOFF
-#define UNCLOG_LEVEL_CUTOFF INT_MAX
+#define UNCLOG_LEVEL_CUTOFF UNCLOG_LEVEL_MINIMUM
 #endif
 
 #define UNCLOG(ha, le, fi, fu, li, ...)                                  \
