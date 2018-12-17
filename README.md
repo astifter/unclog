@@ -1,12 +1,13 @@
 ## TL;DR
 
-unclog is a zero-config, yet highly flexible logging library for C. It currently only supports POSIX-style OSes and needs pthread-style mutexes. CMake is used for building. 
-
-There are plans to move from CMake to autotools OR add Windows support. Let's see.
+unclog is a zero-config, yet highly flexible logging library for C. It currently only supports POSIX-style OSes and needs pthread-style mutexes.
 
 ### Compile and Install
 
-make PREFIX=/usr/local install
+./autogen.sh
+./configure
+make
+make install
 
 ## The Name
 

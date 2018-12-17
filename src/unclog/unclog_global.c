@@ -24,16 +24,18 @@ unclog_global_t* unclog_global_create(void) {
 
     fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
     fprintf(stderr, "g->defaults.options: 0x%02x\n", g->defaults.options);
-    for (unclog_source_t* s = g->sources; s != NULL; s = s->next) {
-        fprintf(stderr, "g->source[%s].level: %s\n", s->source,
-                unclog_level_tostr(s->public.level));
+    unclog_source_t* source = g->sources;
+    for (; source != NULL; source = source->next) {
+        fprintf(stderr, "g->source[%s].level: %s\n", source->source,
+                unclog_level_tostr(source->public.level));
     }
-    for (unclog_sink_t* s = g->sinks; s != NULL; s = s->next) {
-        fprintf(stderr, "g->sink[%s].level: %s\n", s->sink, unclog_level_tostr(s->common.level));
-        fprintf(stderr, "g->sink[%s].options: 0x%02x\n", s->sink, s->common.options);
-        unclog_keyvalue_t* kv = s->values;
+    unclog_sink_t* sink = g->sinks;
+    for (; sink != NULL; sink = sink->next) {
+        fprintf(stderr, "g->sink[%s].level: %s\n", sink->sink, unclog_level_tostr(sink->common.level));
+        fprintf(stderr, "g->sink[%s].options: 0x%02x\n", sink->sink, sink->common.options);
+        unclog_keyvalue_t* kv = sink->values;
         for (; kv != NULL; kv = kv->next) {
-            fprintf(stderr, "g->sink[%s].%s: %s\n", s->sink, kv->key, kv->value);
+            fprintf(stderr, "g->sink[%s].%s: %s\n", sink->sink, kv->key, kv->value);
         }
     }
 
