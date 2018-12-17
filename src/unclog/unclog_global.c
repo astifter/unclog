@@ -27,7 +27,7 @@ unclog_global_t* unclog_global_create(void) {
     unclog_source_t* source = g->sources;
     for (; source != NULL; source = source->next) {
         fprintf(stderr, "g->source[%s].level: %s\n", source->source,
-                unclog_level_tostr(source->public.level));
+                unclog_level_tostr(source->level));
     }
     unclog_sink_t* sink = g->sinks;
     for (; sink != NULL; sink = sink->next) {

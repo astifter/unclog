@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
 static unclog_global_t* unclog_global = NULL;
@@ -29,27 +30,29 @@ unclog_t* unclog_open(const char* source) {
     return (unclog_t*)handle;
 }
 
-#define GET_UNCLOG_HANDLE(ha) \
-    if (ha == NULL) return;   \
-    unclog_source_t* handle = (unclog_source_t*)(ha);
+void unclog_log(unclog_data_t data, ...) {
+    if (data.ha == NULL) return;
 
-void unclog_log(unclog_t* public_handle, unsigned int level, const char* file, const char* func,
-                unsigned int line, const char* fmt, ...) {
-    GET_UNCLOG_HANDLE(public_handle);
-    char buffer[PATH_MAX] = {0};
+    unclog_data_int_t di;
+    memcpy(&di, &data, sizeof(unclog_data_t));
+    clock_gettime(CLOCK_REALTIME, &di.now);
 
-    (void)func;
-    sprintf(buffer, "<%c> %s: %s:%d %s\n", unclog_level_tochar(level), handle->source, file, line,
-            fmt);
-
-    va_list al;
-    va_start(al, fmt);
-    vfprintf(stderr, buffer, al);
-    va_end(al);
+    pthread_rwlock_rdlock(&unclog_mutex);
+    unclog_sink_t* sink = unclog_global->sinks;
+    for (; sink != NULL; sink = sink->next) {
+        if (sink->log == NULL) continue;
+        va_list al;
+        va_start(al, data);
+        di.sink = sink;
+        sink->log(&di, al);
+        va_end(al);
+    }
+    pthread_rwlock_unlock(&unclog_mutex);
 }
 
 void unclog_close(unclog_t* public_handle) {
-    GET_UNCLOG_HANDLE(public_handle);
+    if (public_handle == NULL) return;
+    unclog_source_t* handle = (unclog_source_t*)public_handle;
 
     pthread_rwlock_wrlock(&unclog_mutex);
 

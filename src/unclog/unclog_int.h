@@ -2,10 +2,14 @@
 
 #include "unclog/unclog.h"
 
+#include <stdarg.h>
 #include <stdint.h>
+#include <time.h>
 
 typedef struct unclog_source_s {
-    unclog_t public;
+    // keep in sync with unclog_t
+    int level;
+    // keep in sync with unclog_t
     int active;
 
     char* source;
@@ -33,13 +37,30 @@ typedef struct unclog_values_s {
     uint32_t options;
 } unclog_values_t;
 
-typedef struct unclog_sink_s {
+typedef struct unclog_sink_s unclog_sink_t;
+
+typedef struct unclog_data_int_s {
+    // keep in sync with unclog_data_t
+    unclog_t* ha;
+    int le;
+    const char* fi;
+    const char* fu;
+    unsigned int li;
+    // keep in sync with unclog_data_t
+    struct timespec now;
+    struct unclog_sink_s* sink;
+} unclog_data_int_t;
+
+typedef void (*unclog_sink_log_t)(unclog_data_int_t* d, va_list l);
+
+struct unclog_sink_s {
     unclog_values_t common;
     unclog_keyvalue_t* values;
+    unclog_sink_log_t log;
 
     char* sink;
     struct unclog_sink_s* next;
-} unclog_sink_t;
+};
 
 typedef struct unclog_global_s {
     unclog_values_t defaults;

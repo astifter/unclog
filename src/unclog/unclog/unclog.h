@@ -1,5 +1,7 @@
 #pragma once
 
+#define _POSIX_C_SOURCE 199309L
+
 #include <limits.h>
 #include <stddef.h>
 
@@ -19,36 +21,38 @@ extern "C" {
 
 typedef struct unclog_s { int level; } unclog_t;
 
+typedef struct unclog_data_s {
+    unclog_t* ha;
+    int le;
+    const char* fi;
+    const char* fu;
+    unsigned int li;
+} unclog_data_t;
+
 unclog_t* unclog_open(const char* source);
-void unclog_log(unclog_t* handle, unsigned int level, const char* file, const char* func,
-                unsigned int line, const char* fmt, ...);
+void unclog_log(unclog_data_t data, ...);
 void unclog_close(unclog_t* handle);
 
 #ifndef UNCLOG_LEVEL_CUTOFF
 #define UNCLOG_LEVEL_CUTOFF UNCLOG_LEVEL_MINIMUM
 #endif
 
-#define UNCLOG(ha, le, fi, fu, li, ...)                                  \
-    {                                                                    \
-        if ((le) <= (UNCLOG_LEVEL_CUTOFF))                               \
-            if (((ha) != NULL) && ((le) <= (ha)->level))                 \
-                unclog_log((ha), (le), (fi), (fu), (li), ##__VA_ARGS__); \
+#define UNCLOG(h, l, ...)                                                                  \
+    {                                                                                      \
+        if (((l) <= (UNCLOG_LEVEL_CUTOFF)) && ((h) != NULL) && ((l) <= (h)->level))        \
+            unclog_log(                                                                    \
+                (unclog_data_t){                                                           \
+                    .ha = (h), .le = (l), .fi = __FILE__, .fu = __func__, .li = __LINE__}, \
+                ##__VA_ARGS__);                                                            \
     }
 
-#define UL_FAT(ha, ...) \
-    UNCLOG((ha), UNCLOG_LEVEL_FATAL, __FILE__, __func__, __LINE__, ##__VA_ARGS__);
-#define UL_CRI(ha, ...) \
-    UNCLOG((ha), UNCLOG_LEVEL_CRITICAL, __FILE__, __func__, __LINE__, ##__VA_ARGS__);
-#define UL_ERR(ha, ...) \
-    UNCLOG((ha), UNCLOG_LEVEL_ERROR, __FILE__, __func__, __LINE__, ##__VA_ARGS__);
-#define UL_WAR(ha, ...) \
-    UNCLOG((ha), UNCLOG_LEVEL_WARNING, __FILE__, __func__, __LINE__, ##__VA_ARGS__);
-#define UL_INF(ha, ...) \
-    UNCLOG((ha), UNCLOG_LEVEL_INFO, __FILE__, __func__, __LINE__, ##__VA_ARGS__);
-#define UL_DEB(ha, ...) \
-    UNCLOG((ha), UNCLOG_LEVEL_DEBUG, __FILE__, __func__, __LINE__, ##__VA_ARGS__);
-#define UL_TRA(ha, ...) \
-    UNCLOG((ha), UNCLOG_LEVEL_TRACE, __FILE__, __func__, __LINE__, ##__VA_ARGS__);
+#define UL_FAT(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_FATAL, ##__VA_ARGS__);
+#define UL_CRI(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_CRITICAL, ##__VA_ARGS__);
+#define UL_ERR(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_ERROR, ##__VA_ARGS__);
+#define UL_WAR(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_WARNING, ##__VA_ARGS__);
+#define UL_INF(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_INFO, ##__VA_ARGS__);
+#define UL_DEB(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_DEBUG, ##__VA_ARGS__);
+#define UL_TRA(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_TRACE, ##__VA_ARGS__);
 
 #ifdef __cplusplus
 }

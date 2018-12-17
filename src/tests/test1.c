@@ -36,8 +36,9 @@ static void* test_thread(void* data) {
             wait.tv_sec = 0;
             wait.tv_nsec = random() * 1000000000.0 / RAND_MAX;
         }
-        unclog_log(l, level, __FILE__, __func__, __LINE__, "test level %4d, sleep: %ld.%09ld",
-                   level, wait.tv_sec, wait.tv_nsec);
+        unclog_log(
+            (unclog_data_t){.ha = l, .le = level, .fi = __FILE__, .fu = __func__, .li = __LINE__},
+            "test level %4d, sleep: %ld.%09ld", level, wait.tv_sec, wait.tv_nsec);
         nanosleep(&wait, NULL);
     }
     unclog_close(l);
@@ -53,20 +54,17 @@ static test_thread_param_t test_params[] = {
 
 int main(int argc, char** argv) {
     srandom(time(NULL));
-    fprintf(stderr,
-            "--------------------------------------------------------------------------------\n");
+    fprintf(stderr, "----------------------------------------------------------------------\n");
     (void)argc;
     (void)argv;
     unclog_t* l1 = unclog_open("source1");
-    fprintf(stderr,
-            "--------------------------------------------------------------------------------\n");
+    fprintf(stderr, "----------------------------------------------------------------------\n");
     UL_ERR(l1, "fritz: %d", 45);
     unclog_t* l2 = unclog_open("source2");
     UL_TRA(l2, "herbert");
     unclog_close(l1);
     unclog_close(l2);
-    fprintf(stderr,
-            "--------------------------------------------------------------------------------\n");
+    fprintf(stderr, "----------------------------------------------------------------------\n");
     for (test_thread_param_t* p = test_params; p->thread != 1; p++) {
         pthread_t threads[THREAD_COUNT];
         test_thread_param_t thread_data[THREAD_COUNT];
@@ -78,9 +76,18 @@ int main(int argc, char** argv) {
         for (int i = 0; i < THREAD_COUNT; i++) {
             pthread_join(threads[i], NULL);
         }
-        fprintf(
-            stderr,
-            "--------------------------------------------------------------------------------\n");
+        fprintf(stderr, "----------------------------------------------------------------------\n");
     }
+#define ITERATIONS 10000000
+    unclog_t* l = unclog_open("speed");
+    struct timespec start;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    for (int i = 0; i < ITERATIONS; i++) {
+        UL_ERR(l, "logging %d", i);
+    }
+    struct timespec stop;
+    clock_gettime(CLOCK_MONOTONIC, &stop);
+    fprintf(stderr, "%d messages took %ld seconds\n", ITERATIONS, stop.tv_sec - start.tv_sec);
+    fprintf(stderr, "----------------------------------------------------------------------\n");
     return 0;
 }

@@ -10,7 +10,7 @@ unclog_source_t* unclog_source_create(unclog_values_t* defaults, const char* sou
     memset(handle, 0, sizeof(unclog_source_t));
 
     handle->source = strdup(source);
-    handle->public.level = defaults->level;
+    handle->level = defaults->level;
 
     return handle;
 }
