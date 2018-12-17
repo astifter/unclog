@@ -23,3 +23,5 @@ Makefile
 *.orig
 *~
 *.swp
+cscope.*
+/.ide/
