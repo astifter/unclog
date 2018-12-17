@@ -18,6 +18,7 @@ Makefile
 /config.status
 /configure
 /libtool
+/documentation/
 
 *.orig
 *~

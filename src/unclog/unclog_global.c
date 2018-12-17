@@ -31,7 +31,8 @@ unclog_global_t* unclog_global_create(void) {
     }
     unclog_sink_t* sink = g->sinks;
     for (; sink != NULL; sink = sink->next) {
-        fprintf(stderr, "g->sink[%s].level: %s\n", sink->sink, unclog_level_tostr(sink->common.level));
+        fprintf(stderr, "g->sink[%s].level: %s\n", sink->sink,
+                unclog_level_tostr(sink->common.level));
         fprintf(stderr, "g->sink[%s].options: 0x%02x\n", sink->sink, sink->common.options);
         unclog_keyvalue_t* kv = sink->values;
         for (; kv != NULL; kv = kv->next) {

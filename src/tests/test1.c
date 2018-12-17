@@ -1,7 +1,7 @@
 #define _BSD_SOURCE
 #define _POSIX_C_SOURCE 199309L
 
-#include <unclog.h>
+#include <unclog/unclog.h>
 
 #include <pthread.h>
 #include <stdio.h>

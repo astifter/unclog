@@ -1,2 +1,2 @@
 #!/bin/bash
-autoreconf --install
+autoreconf -v -f --install
