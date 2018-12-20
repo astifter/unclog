@@ -17,6 +17,12 @@ typedef struct test_thread_param_s {
     int use_random_level;
 } test_thread_param_t;
 
+#define THREAD_COUNT 5
+static test_thread_param_t test_params[] = {
+    {0, 1, 1, 1}, {0, 1, 1, 0}, {0, 1, 0, 1}, {0, 1, 0, 0}, {0, 0, 1, 1},
+    {0, 0, 1, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}, {1, 0, 0, 0},
+};
+
 static void* test_thread(void* data) {
     test_thread_param_t* param = data;
 
@@ -46,25 +52,41 @@ static void* test_thread(void* data) {
     return NULL;
 }
 
-#define THREAD_COUNT 10
-static test_thread_param_t test_params[] = {
-    {0, 1, 1, 1}, {0, 1, 1, 0}, {0, 1, 0, 1}, {0, 1, 0, 0}, {0, 0, 1, 1},
-    {0, 0, 1, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}, {1, 0, 0, 0},
-};
+void* sleepthread(void* data) {
+    int* shutdown = (void*)data;
+    struct timespec sleep = {15, 0};
+    nanosleep(&sleep, NULL);
+    *shutdown = 1;
+    return NULL;
+}
+
+struct timespec timespec_diff(struct timespec t1, struct timespec t2) {
+	long nsecs = t1.tv_nsec - t2.tv_nsec;
+	if (nsecs < 0) {
+		nsecs += 1000000000;
+		t1.tv_sec -= 1;
+	}
+	long nsecs_rem = nsecs / 1000000000;
+	t1.tv_sec -= nsecs_rem;
+	long secs = t1.tv_sec - t2.tv_sec;
+	return (struct timespec){ secs, nsecs };
+}
 
 int main(int argc, char** argv) {
-    srandom(time(NULL));
-    fprintf(stderr, "----------------------------------------------------------------------\n");
     (void)argc;
     (void)argv;
-    unclog_t* l1 = unclog_open("source1");
+
+    struct timespec start, stop, diff;
     fprintf(stderr, "----------------------------------------------------------------------\n");
+
+    unclog_t* l1 = unclog_open("source1");
     UL_ERR(l1, "fritz: %d", 45);
     unclog_t* l2 = unclog_open("source2");
     UL_TRA(l2, "herbert");
     unclog_close(l1);
     unclog_close(l2);
     fprintf(stderr, "----------------------------------------------------------------------\n");
+
     for (test_thread_param_t* p = test_params; p->thread != 1; p++) {
         pthread_t threads[THREAD_COUNT];
         test_thread_param_t thread_data[THREAD_COUNT];
@@ -78,16 +100,24 @@ int main(int argc, char** argv) {
         }
         fprintf(stderr, "----------------------------------------------------------------------\n");
     }
-#define ITERATIONS 10000000
+
+    int shutdown = 0;
+    pthread_t timerthread;
+    pthread_create(&timerthread, NULL, sleepthread, &shutdown);
+
     unclog_t* l = unclog_open("speed");
-    struct timespec start;
     clock_gettime(CLOCK_MONOTONIC, &start);
-    for (int i = 0; i < ITERATIONS; i++) {
+    int i = 0;
+    while (shutdown == 0) {
         UL_ERR(l, "logging %d", i);
+        i++;
     }
-    struct timespec stop;
     clock_gettime(CLOCK_MONOTONIC, &stop);
-    fprintf(stderr, "%d messages took %ld seconds\n", ITERATIONS, stop.tv_sec - start.tv_sec);
+	diff = timespec_diff(stop, start);
+    fprintf(stderr, "start %ld.%09ld seconds\n", start.tv_sec, start.tv_nsec);
+    fprintf(stderr, "stop %ld.%09ld seconds\n", stop.tv_sec, stop.tv_nsec);
+	double ddiff = diff.tv_sec + (diff.tv_nsec / 1000000000.0);
+    fprintf(stderr, "%d messages took %ld.%09ld seconds %lf\n", i, diff.tv_sec, diff.tv_nsec, i/ddiff);
     fprintf(stderr, "----------------------------------------------------------------------\n");
     return 0;
 }
