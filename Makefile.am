@@ -4,8 +4,8 @@ SUBDIRS = src
 EXTRA_DIST = autogen.sh unclog.doxygen README.md
 
 # valgrind testing
-valgrind:
-	cd staging/tests && LD_LIBRARY_PATH=../lib $@ --leak-check=full --track-origins=yes ./test1
+valgrind gdb:
+	$(MAKE) -C src/tests $@
 
 # documentation and formating
 html-local: format documentation/html/index.html
