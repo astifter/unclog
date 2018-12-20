@@ -22,6 +22,11 @@ unclog_global_t* unclog_global_create(void) {
         ini_parse(*f, unclog_ini_handler, g);
     }
 
+    if (g->sinks_defined == 0) {
+        unclog_sink_t* s = unclog_sink_create(g, "libunclog_stderr.so");
+        unclog_global_sink_add(g, s);
+    }
+
     fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
     fprintf(stderr, "g->defaults.options: 0x%02x\n", g->defaults.options);
     unclog_source_t* source = g->sources;

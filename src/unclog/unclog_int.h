@@ -64,6 +64,7 @@ struct unclog_sink_s {
 
 typedef struct unclog_global_s {
     unclog_values_t defaults;
+    int sinks_defined;
 
     unclog_source_t* sources;
     unclog_sink_t* sinks;

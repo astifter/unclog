@@ -48,6 +48,8 @@ static void unclog_defaults_handler(void* g, const char* name, const char* value
             token = strtok_r(NULL, ",", &token_save);
         }
         free(buffer);
+
+        global->sinks_defined = 1;
     }
 }
 

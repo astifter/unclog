@@ -8,16 +8,39 @@
 #include <string.h>
 
 static void unclog_sink_stderr(unclog_data_int_t* data, va_list list) {
-    struct tm time;
-    gmtime_r(&data->now.tv_sec, &time);
+    char buffer[PATH_MAX] = {0};
+    char* bufferpos = buffer;
 
-    char timebuffer[64];
-    strftime(timebuffer, 64, "%Y-%m-%d %H:%M:%S", &time);
+    uint32_t options = data->sink->common.options;
 
-    const char* fmt = va_arg(list, char*);
-    char buffer[PATH_MAX];
-    sprintf(buffer, "%s <%c> %s: %s:%d %s\n", timebuffer, unclog_level_tochar(data->le),
-            ((unclog_source_t*)data->ha)->source, data->fi, data->li, fmt);
+    if (options & UNCLOG_OPT_TIMESTAMP) {
+        struct tm time;
+        gmtime_r(&data->now.tv_sec, &time);
+
+        char timebuffer[64];
+        int size = strftime(timebuffer, 64, "%Y-%m-%d %H:%M:%S", &time);
+
+        memcpy(buffer, timebuffer, size);
+        bufferpos += size;
+    }
+    if (options & UNCLOG_OPT_LEVEL) {
+        bufferpos += sprintf(bufferpos, " <%c>", unclog_level_tochar(data->le));
+    }
+    if (options & UNCLOG_OPT_SOURCE) {
+        bufferpos += sprintf(bufferpos, " %s:", ((unclog_source_t*)data->ha)->source);
+    }
+    if (options & UNCLOG_OPT_LOCATION) {
+        if (options & UNCLOG_OPT_FILE) bufferpos += sprintf(bufferpos, " %s:", data->fi);
+        if (options & UNCLOG_OPT_LINE) bufferpos += sprintf(bufferpos, "%d:", data->li);
+    }
+    if (options & UNCLOG_OPT_MESSAGE) {
+        *bufferpos = ' ';
+        bufferpos++;
+        const char* fmt = va_arg(list, char*);
+        bufferpos += vsprintf(bufferpos, fmt, list);
+    }
+    *bufferpos = '\n';
+    bufferpos++;
 
     vfprintf(stderr, buffer, list);
 }
