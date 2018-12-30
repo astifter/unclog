@@ -23,7 +23,7 @@ unclog_global_t* unclog_global_create(void) {
     }
 
     if (g->sinks_defined == 0) {
-        unclog_sink_t* s = unclog_sink_create(g, "libunclog_stderr.so");
+        unclog_sink_t* s = unclog_sink_create(&g->defaults, "libunclog_stderr.so");
         unclog_global_sink_add(g, s);
     }
 

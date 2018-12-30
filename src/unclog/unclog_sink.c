@@ -7,6 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+size_t stringappend(char* dest, const char* src) {
+	size_t size = strlen(src);
+	memcpy(dest, src, size + 1);
+	return size;
+}
+
 static void unclog_sink_stderr(unclog_data_int_t* data, va_list list) {
     char buffer[PATH_MAX] = {0};
     char* bufferpos = buffer;
@@ -24,14 +30,24 @@ static void unclog_sink_stderr(unclog_data_int_t* data, va_list list) {
         bufferpos += size;
     }
     if (options & UNCLOG_OPT_LEVEL) {
-        bufferpos += sprintf(bufferpos, " <%c>", unclog_level_tochar(data->le));
+		bufferpos += stringappend(bufferpos, " < >");
+		*(bufferpos - 2) = unclog_level_tochar(data->le);
     }
     if (options & UNCLOG_OPT_SOURCE) {
-        bufferpos += sprintf(bufferpos, " %s:", ((unclog_source_t*)data->ha)->source);
+		*(bufferpos++) = ' ';
+        bufferpos += stringappend(bufferpos, ((unclog_source_t*)data->ha)->source);
+		*(bufferpos++) = ':';
     }
-    if (options & UNCLOG_OPT_LOCATION) {
-        if (options & UNCLOG_OPT_FILE) bufferpos += sprintf(bufferpos, " %s:", data->fi);
-        if (options & UNCLOG_OPT_LINE) bufferpos += sprintf(bufferpos, "%d:", data->li);
+    if (options & UNCLOG_OPT_FILE) {
+		*(bufferpos++) = ' ';
+		bufferpos += stringappend(bufferpos, data->fi);
+	}
+    if (options & UNCLOG_OPT_LINE) {
+		*(bufferpos++) = ':';
+		bufferpos += sprintf(bufferpos, "%d", data->li);
+		*(bufferpos++) = ':';
+	} else {
+		*(bufferpos++) = ' ';
     }
     if (options & UNCLOG_OPT_MESSAGE) {
         *bufferpos = ' ';

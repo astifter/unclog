@@ -116,8 +116,17 @@ int main(int argc, char** argv) {
 	diff = timespec_diff(stop, start);
     fprintf(stderr, "start %ld.%09ld seconds\n", start.tv_sec, start.tv_nsec);
     fprintf(stderr, "stop %ld.%09ld seconds\n", stop.tv_sec, stop.tv_nsec);
-	double ddiff = diff.tv_sec + (diff.tv_nsec / 1000000000.0);
-    fprintf(stderr, "%d messages took %ld.%09ld seconds %lf\n", i, diff.tv_sec, diff.tv_nsec, i/ddiff);
+
+	double msg_sec = i / (diff.tv_sec + (diff.tv_nsec / 1000000000.0)); 
+	char* postfix = "";
+	if (msg_sec > 1000) {
+		msg_sec /= 1000; postfix = "k";
+	}
+	if (msg_sec > 1000) {
+		msg_sec /= 1000; postfix = "M";
+	}
+
+    fprintf(stderr, "%d messages took %ld.%09ld seconds: %.3lf%s msgs/sec\n", i, diff.tv_sec, diff.tv_nsec, msg_sec, postfix);
     fprintf(stderr, "----------------------------------------------------------------------\n");
     return 0;
 }
