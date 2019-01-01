@@ -9,7 +9,7 @@
 #include <string.h>
 
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
-static unclog_global_t* unclog_global = NULL;
+unclog_global_t* unclog_global = NULL;
 
 unclog_t* unclog_open(const char* source) {
     pthread_rwlock_wrlock(&unclog_mutex);

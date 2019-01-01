@@ -93,3 +93,6 @@ char unclog_level_tochar(int level);
 const char* unclog_level_tostr(int level);
 uint32_t unclog_details_todetail(const char* value);
 char* unclog_details_tostr(uint32_t details);
+
+// for testing
+extern unclog_global_t* unclog_global;
