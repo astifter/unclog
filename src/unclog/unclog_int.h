@@ -33,7 +33,7 @@ typedef struct unclog_keyvalue_s {
 
 typedef struct unclog_values_s {
     int level;
-    uint32_t options;
+    uint32_t details;
 } unclog_values_t;
 
 typedef struct unclog_sink_s unclog_sink_t;
@@ -92,3 +92,4 @@ int unclog_level_tolevel(const char* value);
 char unclog_level_tochar(int level);
 const char* unclog_level_tostr(int level);
 uint32_t unclog_details_todetail(const char* value);
+char* unclog_details_tostr(uint32_t details);

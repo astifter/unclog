@@ -16,7 +16,7 @@ static unclog_levels_t unclog_levels[] = {
 };
 
 typedef struct unclog_details_s {
-    uint32_t option;
+    uint32_t detail;
     const char* name;
 } unclog_details_t;
 
@@ -60,8 +60,27 @@ uint32_t unclog_details_todetail(const char* value) {
     unclog_details_t* d = unclog_details;
     for (; d->name != NULL; d++) {
         if (strcmp(d->name, value) == 0) {
-            return d->option;
+            return d->detail;
         }
     }
     return 0;
+}
+
+char* unclog_details_tostr(uint32_t details) {
+	char* retval = malloc(4096);
+	memset(retval, 0, 4096);
+	char* buffer = retval;
+
+	int next = 0;
+    unclog_details_t* d = unclog_details;
+    for (; d->name != NULL; d++) {
+		if (!(d->detail & details)) continue;
+
+		if (next != 0)
+			buffer += sprintf(buffer, ",");
+		next = 1;
+		buffer += sprintf(buffer, "%s", d->name);
+    }
+
+    return retval;
 }

@@ -14,7 +14,7 @@ unclog_global_t* unclog_global_create(void) {
     unclog_global_t* g = malloc(sizeof(unclog_global_t));
     memset(g, 0, sizeof(unclog_global_t));
     g->defaults.level = UNCLOG_LEVEL_DEFAULT;
-    g->defaults.options = UNCLOG_OPT_DEFAULTS;
+    g->defaults.details = UNCLOG_OPT_DEFAULTS;
 
     const char** f = unclog_ini_files;
     for (; *f != NULL; f++) {
@@ -28,7 +28,9 @@ unclog_global_t* unclog_global_create(void) {
     }
 
     fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
-    fprintf(stderr, "g->defaults.options: 0x%02x\n", g->defaults.options);
+    char* detailsstr = unclog_details_tostr(g->defaults.details);
+    fprintf(stderr, "g->defaults.details: %s\n", detailsstr);
+    free(detailsstr);
     unclog_source_t* source = g->sources;
     for (; source != NULL; source = source->next) {
         fprintf(stderr, "g->source[%s].level: %s\n", source->source,
@@ -38,7 +40,9 @@ unclog_global_t* unclog_global_create(void) {
     for (; sink != NULL; sink = sink->next) {
         fprintf(stderr, "g->sink[%s].level: %s\n", sink->sink,
                 unclog_level_tostr(sink->common.level));
-        fprintf(stderr, "g->sink[%s].options: 0x%02x\n", sink->sink, sink->common.options);
+        detailsstr = unclog_details_tostr(sink->common.details);
+        fprintf(stderr, "g->sink[%s].details: %s\n", sink->sink, detailsstr);
+        free(detailsstr);
         unclog_keyvalue_t* kv = sink->values;
         for (; kv != NULL; kv = kv->next) {
             fprintf(stderr, "g->sink[%s].%s: %s\n", sink->sink, kv->key, kv->value);

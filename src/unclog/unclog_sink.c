@@ -17,9 +17,9 @@ static void unclog_sink_stderr(unclog_data_int_t* data, va_list list) {
     char buffer[PATH_MAX] = {0};
     char* bufferpos = buffer;
 
-    uint32_t options = data->sink->common.options;
+    uint32_t details = data->sink->common.details;
 
-    if (options & UNCLOG_OPT_TIMESTAMP) {
+    if (details & UNCLOG_OPT_TIMESTAMP) {
         struct tm time;
         gmtime_r(&data->now.tv_sec, &time);
 
@@ -29,27 +29,27 @@ static void unclog_sink_stderr(unclog_data_int_t* data, va_list list) {
         memcpy(buffer, timebuffer, size);
         bufferpos += size;
     }
-    if (options & UNCLOG_OPT_LEVEL) {
+    if (details & UNCLOG_OPT_LEVEL) {
 		bufferpos += stringappend(bufferpos, " < >");
 		*(bufferpos - 2) = unclog_level_tochar(data->le);
     }
-    if (options & UNCLOG_OPT_SOURCE) {
+    if (details & UNCLOG_OPT_SOURCE) {
 		*(bufferpos++) = ' ';
         bufferpos += stringappend(bufferpos, ((unclog_source_t*)data->ha)->source);
 		*(bufferpos++) = ':';
     }
-    if (options & UNCLOG_OPT_FILE) {
+    if (details & UNCLOG_OPT_FILE) {
 		*(bufferpos++) = ' ';
 		bufferpos += stringappend(bufferpos, data->fi);
 	}
-    if (options & UNCLOG_OPT_LINE) {
+    if (details & UNCLOG_OPT_LINE) {
 		*(bufferpos++) = ':';
 		bufferpos += sprintf(bufferpos, "%d", data->li);
 		*(bufferpos++) = ':';
 	} else {
 		*(bufferpos++) = ' ';
     }
-    if (options & UNCLOG_OPT_MESSAGE) {
+    if (details & UNCLOG_OPT_MESSAGE) {
         *bufferpos = ' ';
         bufferpos++;
         const char* fmt = va_arg(list, char*);

@@ -12,13 +12,13 @@ static void unclog_level_handler(unclog_values_t* v, const char* value) {
     v->level = unclog_level_tolevel(value);
 }
 
-static void unclog_options_handler(unclog_values_t* v, const char* value) {
+static void unclog_details_handler(unclog_values_t* v, const char* value) {
     char* buffer = strdup(value);
     char* token_save = NULL;
     char* token = strtok_r(buffer, ",", &token_save);
-    v->options = 0;
+    v->details = 0;
     while (token != NULL) {
-        v->options |= unclog_details_todetail(token);
+        v->details |= unclog_details_todetail(token);
         token = strtok_r(NULL, ",", &token_save);
     }
     free(buffer);
@@ -28,7 +28,7 @@ static int unclog_common_handler(unclog_values_t* v, const char* name, const cha
     if (MATCH(name, "Level")) {
         unclog_level_handler(v, value);
     } else if (MATCH(name, "Details")) {
-        unclog_options_handler(v, value);
+        unclog_details_handler(v, value);
     } else {
         return 0;
     }
