@@ -62,6 +62,10 @@ int unclog_ini_handler(void* g, const char* section, const char* name, const cha
         return 0;
     }
 
+    if (global->sinks_defined == 0) {
+        unclog_defaults_handler(global, "Sinks", "libunclog_stderr.so");
+    }
+
     unclog_sink_t* sink = unclog_global_sink_get(global, section);
     if (sink != NULL) {
         if (!unclog_common_handler(&sink->common, name, value))
