@@ -20,7 +20,8 @@ unclog_global_t* unclog_global_create(const char* config, int usefile) {
         const char** f = unclog_ini_files;
         for (; *f != NULL; f++) {
             if (access(*f, R_OK) != 0) continue;
-            ini_parse(*f, unclog_ini_handler, g); break;
+            ini_parse(*f, unclog_ini_handler, g);
+            break;
         }
     } else {
         if (config != NULL) {
@@ -31,7 +32,7 @@ unclog_global_t* unclog_global_create(const char* config, int usefile) {
     if (g->sinks_defined == 0) {
         unclog_sink_t* s = unclog_sink_create(&g->defaults, "libunclog_stderr.so");
         unclog_global_sink_add(g, s);
-	}
+    }
 
     fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
     char* detailsstr = unclog_details_tostr(g->defaults.details);
