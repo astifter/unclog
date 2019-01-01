@@ -1,6 +1,7 @@
 #pragma once
 
 #include "unclog/unclog.h"
+#include "unclog/unclog_adv.h"
 
 #include <stdarg.h>
 #include <stdint.h>
