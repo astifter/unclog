@@ -10,21 +10,22 @@ static const char* unclog_ini_files[] = {
     "./unclog.ini", "/etc/unclog.ini", NULL,
 };
 
-unclog_global_t* unclog_global_create(void) {
+unclog_global_t* unclog_global_create(const char* config, int usefile) {
     unclog_global_t* g = malloc(sizeof(unclog_global_t));
     memset(g, 0, sizeof(unclog_global_t));
     g->defaults.level = UNCLOG_LEVEL_DEFAULT;
     g->defaults.details = UNCLOG_OPT_DEFAULTS;
 
-    const char** f = unclog_ini_files;
-    for (; *f != NULL; f++) {
-        if (access(*f, R_OK) != 0) continue;
-        ini_parse(*f, unclog_ini_handler, g);
-    }
-
-    if (g->sinks_defined == 0) {
-        unclog_sink_t* s = unclog_sink_create(&g->defaults, "libunclog_stderr.so");
-        unclog_global_sink_add(g, s);
+    if (usefile == 1) {
+        const char** f = unclog_ini_files;
+        for (; *f != NULL; f++) {
+            if (access(*f, R_OK) != 0) continue;
+            ini_parse(*f, unclog_ini_handler, g);
+        }
+    } else {
+        if (config != NULL) {
+            ini_parse_string(config, unclog_ini_handler, g);
+        }
     }
 
     fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
@@ -52,7 +53,7 @@ unclog_global_t* unclog_global_create(void) {
     return g;
 }
 
-void unclog_global_destroy(unclog_global_t* global) {
+void* unclog_global_destroy(unclog_global_t* global) {
     unclog_sink_t* sink = global->sinks;
     while (sink != NULL) {
         unclog_sink_t* d = sink;
@@ -67,6 +68,8 @@ void unclog_global_destroy(unclog_global_t* global) {
     }
 
     free(global);
+
+    return NULL;
 }
 
 void unclog_global_source_add(unclog_global_t* global, unclog_source_t* handle) {

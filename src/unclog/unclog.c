@@ -11,12 +11,39 @@
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
 unclog_global_t* unclog_global = NULL;
 
+static void unclog_init_nolock(const char* config, int usefile) {
+    if (unclog_global == NULL) {
+        unclog_global = unclog_global_create(config, usefile);
+    }
+}
+
+static void unclog_deinit_nolock(void) {
+    if (unclog_global != NULL) {
+        unclog_global = unclog_global_destroy(unclog_global);
+    }
+}
+
+void unclog_init(const char* config) {
+    pthread_rwlock_wrlock(&unclog_mutex);
+
+    unclog_deinit_nolock();
+    unclog_init_nolock(config, 0);
+
+    pthread_rwlock_unlock(&unclog_mutex);
+}
+
+void unclog_deinit(void) {
+    pthread_rwlock_wrlock(&unclog_mutex);
+
+    unclog_deinit_nolock();
+
+    pthread_rwlock_unlock(&unclog_mutex);
+}
+
 unclog_t* unclog_open(const char* source) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
-    if (unclog_global == NULL) {
-        unclog_global = unclog_global_create();
-    }
+    unclog_init_nolock(NULL, 1);
 
     unclog_source_t* handle = unclog_global_source_get(unclog_global, source);
     if (handle == NULL) {
@@ -69,8 +96,7 @@ void unclog_close(unclog_t* public_handle) {
     }
 
     if (!has_active_handles) {
-        unclog_global_destroy(unclog_global);
-        unclog_global = NULL;
+        unclog_deinit_nolock();
     }
 
     pthread_rwlock_unlock(&unclog_mutex);

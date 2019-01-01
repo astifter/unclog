@@ -73,8 +73,8 @@ typedef struct unclog_global_s {
 
 int unclog_ini_handler(void* user, const char* section, const char* name, const char* value);
 
-unclog_global_t* unclog_global_create(void);
-void unclog_global_destroy(unclog_global_t* global);
+unclog_global_t* unclog_global_create(const char* config, int usefile);
+void* unclog_global_destroy(unclog_global_t* global);
 void unclog_global_source_add(unclog_global_t* global, unclog_source_t* source);
 int unclog_global_source_remove(unclog_global_t* global, unclog_source_t* source);
 void unclog_global_sink_add(unclog_global_t* global, unclog_sink_t* handle);
