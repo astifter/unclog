@@ -33,6 +33,8 @@ unclog_t* unclog_open(const char* source) {
 void unclog_log(unclog_data_t data, ...) {
     if (data.ha == NULL) return;
 
+    if (data.le > data.ha->level) return;
+
     unclog_data_int_t di;
     memcpy(&di, &data, sizeof(unclog_data_t));
     clock_gettime(CLOCK_REALTIME, &di.now);
@@ -41,6 +43,8 @@ void unclog_log(unclog_data_t data, ...) {
     unclog_sink_t* sink = unclog_global->sinks;
     for (; sink != NULL; sink = sink->next) {
         if (sink->log == NULL) continue;
+        if (data.le > sink->common.level) continue;
+
         va_list al;
         va_start(al, data);
         di.sink = sink;
