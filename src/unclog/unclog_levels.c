@@ -2,13 +2,7 @@
 
 #include <string.h>
 
-typedef struct unclog_levels_s {
-    int level;
-    const char* name;
-    char shortname;
-} unclog_levels_t;
-
-static unclog_levels_t unclog_levels[] = {
+unclog_levels_t unclog_levels[] = {
     {UNCLOG_LEVEL_FATAL, "Fatal", 'F'}, {UNCLOG_LEVEL_CRITICAL, "Critical", 'C'},
     {UNCLOG_LEVEL_ERROR, "Error", 'E'}, {UNCLOG_LEVEL_WARNING, "Warning", 'W'},
     {UNCLOG_LEVEL_INFO, "Info", 'I'},   {UNCLOG_LEVEL_DEBUG, "Debug", 'D'},
@@ -67,19 +61,18 @@ uint32_t unclog_details_todetail(const char* value) {
 }
 
 char* unclog_details_tostr(uint32_t details) {
-	char* retval = malloc(4096);
-	memset(retval, 0, 4096);
-	char* buffer = retval;
+    char* retval = malloc(4096);
+    memset(retval, 0, 4096);
+    char* buffer = retval;
 
-	int next = 0;
+    int next = 0;
     unclog_details_t* d = unclog_details;
     for (; d->name != NULL; d++) {
-		if (!(d->detail & details)) continue;
+        if (!(d->detail & details)) continue;
 
-		if (next != 0)
-			buffer += sprintf(buffer, ",");
-		next = 1;
-		buffer += sprintf(buffer, "%s", d->name);
+        if (next != 0) buffer += sprintf(buffer, ",");
+        next = 1;
+        buffer += sprintf(buffer, "%s", d->name);
     }
 
     return retval;

@@ -61,15 +61,15 @@ void* sleepthread(void* data) {
 }
 
 struct timespec timespec_diff(struct timespec t1, struct timespec t2) {
-	long nsecs = t1.tv_nsec - t2.tv_nsec;
-	if (nsecs < 0) {
-		nsecs += 1000000000;
-		t1.tv_sec -= 1;
-	}
-	long nsecs_rem = nsecs / 1000000000;
-	t1.tv_sec -= nsecs_rem;
-	long secs = t1.tv_sec - t2.tv_sec;
-	return (struct timespec){ secs, nsecs };
+    long nsecs = t1.tv_nsec - t2.tv_nsec;
+    if (nsecs < 0) {
+        nsecs += 1000000000;
+        t1.tv_sec -= 1;
+    }
+    long nsecs_rem = nsecs / 1000000000;
+    t1.tv_sec -= nsecs_rem;
+    long secs = t1.tv_sec - t2.tv_sec;
+    return (struct timespec){secs, nsecs};
 }
 
 int main(int argc, char** argv) {
@@ -113,20 +113,23 @@ int main(int argc, char** argv) {
         i++;
     }
     clock_gettime(CLOCK_MONOTONIC, &stop);
-	diff = timespec_diff(stop, start);
+    diff = timespec_diff(stop, start);
     fprintf(stderr, "start %ld.%09ld seconds\n", start.tv_sec, start.tv_nsec);
     fprintf(stderr, "stop %ld.%09ld seconds\n", stop.tv_sec, stop.tv_nsec);
 
-	double msg_sec = i / (diff.tv_sec + (diff.tv_nsec / 1000000000.0)); 
-	char* postfix = "";
-	if (msg_sec > 1000) {
-		msg_sec /= 1000; postfix = "k";
-	}
-	if (msg_sec > 1000) {
-		msg_sec /= 1000; postfix = "M";
-	}
+    double msg_sec = i / (diff.tv_sec + (diff.tv_nsec / 1000000000.0));
+    char* postfix = "";
+    if (msg_sec > 1000) {
+        msg_sec /= 1000;
+        postfix = "k";
+    }
+    if (msg_sec > 1000) {
+        msg_sec /= 1000;
+        postfix = "M";
+    }
 
-    fprintf(stderr, "%d messages took %ld.%09ld seconds: %.3lf%s msgs/sec\n", i, diff.tv_sec, diff.tv_nsec, msg_sec, postfix);
+    fprintf(stderr, "%d messages took %ld.%09ld seconds: %.3lf%s msgs/sec\n", i, diff.tv_sec,
+            diff.tv_nsec, msg_sec, postfix);
     fprintf(stderr, "----------------------------------------------------------------------\n");
     return 0;
 }

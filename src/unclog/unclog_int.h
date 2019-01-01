@@ -88,6 +88,12 @@ unclog_sink_t* unclog_sink_create(unclog_values_t* defaults, const char* sink);
 void unclog_sink_destroy(unclog_sink_t* sink);
 void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* value);
 
+typedef struct unclog_levels_s {
+    int level;
+    const char* name;
+    char shortname;
+} unclog_levels_t;
+
 int unclog_level_tolevel(const char* value);
 char unclog_level_tochar(int level);
 const char* unclog_level_tostr(int level);
@@ -96,3 +102,4 @@ char* unclog_details_tostr(uint32_t details);
 
 // for testing
 extern unclog_global_t* unclog_global;
+extern unclog_levels_t unclog_levels[];
