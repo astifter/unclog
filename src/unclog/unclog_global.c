@@ -28,6 +28,11 @@ unclog_global_t* unclog_global_create(const char* config, int usefile) {
         }
     }
 
+    if (g->sinks_defined == 0) {
+        unclog_sink_t* s = unclog_sink_create(&g->defaults, "libunclog_stderr.so");
+        unclog_global_sink_add(g, s);
+	}
+
     fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
     char* detailsstr = unclog_details_tostr(g->defaults.details);
     fprintf(stderr, "g->defaults.details: %s\n", detailsstr);

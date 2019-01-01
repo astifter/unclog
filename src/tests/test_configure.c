@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
         unclog_levels_t* n = l + 1;
         if (n->name != NULL) {
-            sprintf(buffer, "[Defaults]\nLevel=%s\n[libunclog_stderr.so]\nLevel=Trace", n->name);
+            sprintf(buffer, "[Defaults]\nLevel=%s\n[libunclog_stderr.so]\nLevel=%s", n->name, l->name);
             unclog_init(buffer);
             if (unclog_test_is_initialized() == 0) return -4;
             if (unclog_test_is_level(n->level) != 1) return -5;
