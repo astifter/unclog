@@ -17,16 +17,34 @@ int main(int argc, char** argv) {
         if (unclog_global->defaults.level != l->level) return -3;
 
         for (unclog_levels_t* n = unclog_levels; n->name != NULL; n++) {
-            sprintf(buffer,
-                    "[Defaults]\nLevel=%s\nSinks=someothersink.so\n[someothersink.so]\nLevel=%s\n",
-                    l->name, n->name);
+            sprintf(buffer, "[Defaults]\nLevel=%s\n[libunclog_stderr.so]\nLevel=%s\n", l->name,
+                    n->name);
             unclog_init(buffer);
             if (unclog_global == NULL) return -4;
             if (unclog_global->defaults.level != l->level) return -5;
 
-            unclog_sink_t* s = unclog_global_sink_get(unclog_global, "someothersink.so");
+            unclog_sink_t* s = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
             if (s == NULL) return -6;
             if (s->common.level != n->level) return -7;
+
+            s = unclog_global_sink_get(unclog_global, "someothersink.so");
+            if (s != NULL) return -8;
+        }
+
+        for (unclog_levels_t* n = unclog_levels; n->name != NULL; n++) {
+            sprintf(buffer,
+                    "[Defaults]\nLevel=%s\nSinks=someothersink.so\n[someothersink.so]\nLevel=%s\n",
+                    l->name, n->name);
+            unclog_init(buffer);
+            if (unclog_global == NULL) return -9;
+            if (unclog_global->defaults.level != l->level) return -10;
+
+            unclog_sink_t* s = unclog_global_sink_get(unclog_global, "someothersink.so");
+            if (s == NULL) return -11;
+            if (s->common.level != n->level) return -12;
+
+            s = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
+            if (s != NULL) return -13;
         }
 
         // for (unclog_levels_t* n = unclog_levels; n->name != NULL; n++) {
