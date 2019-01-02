@@ -19,6 +19,7 @@ Makefile
 /configure
 /libtool
 /documentation/
+CUnitAutomated-Results.xml
 
 *.orig
 *~
