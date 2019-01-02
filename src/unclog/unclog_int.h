@@ -81,6 +81,7 @@ int unclog_global_source_remove(unclog_global_t* global, unclog_source_t* source
 void unclog_global_sink_add(unclog_global_t* global, unclog_sink_t* handle);
 unclog_sink_t* unclog_global_sink_get(unclog_global_t* global, const char* sink);
 unclog_source_t* unclog_global_source_get(unclog_global_t* global, const char* source);
+void unclog_global_dump_config(unclog_global_t* g);
 
 unclog_source_t* unclog_source_create(unclog_values_t* defaults, const char* source);
 void unclog_source_destroy(unclog_source_t* source);

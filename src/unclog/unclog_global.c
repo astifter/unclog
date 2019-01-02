@@ -10,6 +10,30 @@ static const char* unclog_ini_files[] = {
     "./unclog.ini", "/etc/unclog.ini", NULL,
 };
 
+void unclog_global_dump_config(unclog_global_t* g) {
+    fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
+    char* detailsstr = unclog_details_tostr(g->defaults.details);
+    fprintf(stderr, "g->defaults.details: %s\n", detailsstr);
+    free(detailsstr);
+    unclog_source_t* source = g->sources;
+    for (; source != NULL; source = source->next) {
+        fprintf(stderr, "g->source[%s].level: %s\n", source->source,
+                unclog_level_tostr(source->level));
+    }
+    unclog_sink_t* sink = g->sinks;
+    for (; sink != NULL; sink = sink->next) {
+        fprintf(stderr, "g->sink[%s].level: %s\n", sink->sink,
+                unclog_level_tostr(sink->common.level));
+        detailsstr = unclog_details_tostr(sink->common.details);
+        fprintf(stderr, "g->sink[%s].details: %s\n", sink->sink, detailsstr);
+        free(detailsstr);
+        unclog_keyvalue_t* kv = sink->values;
+        for (; kv != NULL; kv = kv->next) {
+            fprintf(stderr, "g->sink[%s].%s: %s\n", sink->sink, kv->key, kv->value);
+        }
+    }
+}
+
 unclog_global_t* unclog_global_create(const char* config, int usefile) {
     unclog_global_t* g = malloc(sizeof(unclog_global_t));
     memset(g, 0, sizeof(unclog_global_t));
@@ -32,28 +56,6 @@ unclog_global_t* unclog_global_create(const char* config, int usefile) {
     if (g->sinks_defined == 0) {
         unclog_sink_t* s = unclog_sink_create(&g->defaults, "libunclog_stderr.so");
         unclog_global_sink_add(g, s);
-    }
-
-    fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
-    char* detailsstr = unclog_details_tostr(g->defaults.details);
-    fprintf(stderr, "g->defaults.details: %s\n", detailsstr);
-    free(detailsstr);
-    unclog_source_t* source = g->sources;
-    for (; source != NULL; source = source->next) {
-        fprintf(stderr, "g->source[%s].level: %s\n", source->source,
-                unclog_level_tostr(source->level));
-    }
-    unclog_sink_t* sink = g->sinks;
-    for (; sink != NULL; sink = sink->next) {
-        fprintf(stderr, "g->sink[%s].level: %s\n", sink->sink,
-                unclog_level_tostr(sink->common.level));
-        detailsstr = unclog_details_tostr(sink->common.details);
-        fprintf(stderr, "g->sink[%s].details: %s\n", sink->sink, detailsstr);
-        free(detailsstr);
-        unclog_keyvalue_t* kv = sink->values;
-        for (; kv != NULL; kv = kv->next) {
-            fprintf(stderr, "g->sink[%s].%s: %s\n", sink->sink, kv->key, kv->value);
-        }
     }
 
     return g;
