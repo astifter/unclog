@@ -23,6 +23,51 @@ void initialization_open_close(void) {
 
 void initialization_configuration(void) {
     fprintf(stderr, "%s\n", __func__);
+    char buffer[4096] = {0};
+
+    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
+        CU_ASSERT(unclog_global == NULL);
+
+        sprintf(buffer, "[Defaults]\nLevel=%s\n", l->name);
+        unclog_init(buffer);
+        CU_ASSERT(unclog_global != NULL);
+        CU_ASSERT(unclog_global->defaults.level == l->level);
+
+        for (unclog_levels_t* n = unclog_levels; n->name != NULL; n++) {
+            sprintf(buffer, "[Defaults]\nLevel=%s\n[libunclog_stderr.so]\nLevel=%s\n", l->name,
+                    n->name);
+            unclog_init(buffer);
+            CU_ASSERT(unclog_global != NULL);
+            CU_ASSERT(unclog_global->defaults.level == l->level);
+
+            unclog_sink_t* s = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
+            CU_ASSERT(s != NULL);
+            CU_ASSERT(s->common.level == n->level);
+
+            s = unclog_global_sink_get(unclog_global, "someothersink.so");
+            CU_ASSERT(s == NULL);
+        }
+
+        for (unclog_levels_t* n = unclog_levels; n->name != NULL; n++) {
+            sprintf(buffer,
+                    "[Defaults]\nLevel=%s\nSinks=someothersink.so\n[someothersink.so]\nLevel=%s\n",
+                    l->name, n->name);
+            unclog_init(buffer);
+            CU_ASSERT(unclog_global != NULL);
+            CU_ASSERT(unclog_global->defaults.level == l->level);
+
+            unclog_sink_t* s = unclog_global_sink_get(unclog_global, "someothersink.so");
+            CU_ASSERT(s != NULL);
+            CU_ASSERT(s->common.level == n->level);
+
+            s = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
+            CU_ASSERT(s == NULL);
+        }
+
+        unclog_deinit();
+        CU_ASSERT(unclog_global == NULL);
+    }
+
     CU_ASSERT(1);
 }
 
