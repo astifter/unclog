@@ -17,14 +17,15 @@ typedef struct unclog_source_s {
     struct unclog_source_s* next;
 } unclog_source_t;
 
-#define UNCLOG_OPT_TIMESTAMP 0x00000001
-#define UNCLOG_OPT_SOURCE 0x00000002
-#define UNCLOG_OPT_FILE 0x00000004
-#define UNCLOG_OPT_LINE 0x00000008
-#define UNCLOG_OPT_MESSAGE 0x00000010
-#define UNCLOG_OPT_LEVEL 0x00000020
+#define UNCLOG_OPT_TIMESTAMP 0x01
+#define UNCLOG_OPT_LEVEL 0x02
+#define UNCLOG_OPT_SOURCE 0x04
+#define UNCLOG_OPT_FILE 0x08
+#define UNCLOG_OPT_LINE 0x10
+#define UNCLOG_OPT_MESSAGE 0x20
+#define UNCLOG_OPT_MAXIMUM 0x3F
 #define UNCLOG_OPT_DEFAULTS \
-    (UNCLOG_OPT_LEVEL | UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE)
+    (UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_LEVEL | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE)
 
 typedef struct unclog_keyvalue_s {
     char* key;
@@ -40,13 +41,7 @@ typedef struct unclog_values_s {
 typedef struct unclog_sink_s unclog_sink_t;
 
 typedef struct unclog_data_int_s {
-    // keep in sync with unclog_data_t
-    unclog_t* ha;
-    int le;
-    const char* fi;
-    const char* fu;
-    unsigned int li;
-    // keep in sync with unclog_data_t
+    unclog_data_t* da;
     struct timespec now;
     struct unclog_sink_s* sink;
 } unclog_data_int_t;
@@ -96,6 +91,11 @@ typedef struct unclog_levels_s {
     char shortname;
 } unclog_levels_t;
 
+typedef struct unclog_details_s {
+    uint32_t detail;
+    const char* name;
+} unclog_details_t;
+
 int unclog_level_tolevel(const char* value);
 char unclog_level_tochar(int level);
 const char* unclog_level_tostr(int level);
@@ -105,3 +105,4 @@ char* unclog_details_tostr(uint32_t details);
 // for testing
 extern unclog_global_t* unclog_global;
 extern unclog_levels_t unclog_levels[];
+extern unclog_details_t unclog_details[];

@@ -30,6 +30,8 @@ void unclog_init(const char* config) {
     unclog_init_nolock(config, 0);
 
     pthread_rwlock_unlock(&unclog_mutex);
+
+    unclog_global_dump_config(unclog_global);
 }
 
 void unclog_deinit(void) {
@@ -54,6 +56,7 @@ unclog_t* unclog_open(const char* source) {
 
     pthread_rwlock_unlock(&unclog_mutex);
 
+    unclog_global_dump_config(unclog_global);
     return (unclog_t*)handle;
 }
 
@@ -62,8 +65,7 @@ void unclog_log(unclog_data_t data, ...) {
 
     if (data.le > data.ha->level) return;
 
-    unclog_data_int_t di;
-    memcpy(&di, &data, sizeof(unclog_data_t));
+    unclog_data_int_t di = {.da = &data};
     clock_gettime(CLOCK_REALTIME, &di.now);
 
     pthread_rwlock_rdlock(&unclog_mutex);

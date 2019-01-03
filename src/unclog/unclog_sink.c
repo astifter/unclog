@@ -13,15 +13,16 @@ size_t stringappend(char* dest, const char* src) {
     return size;
 }
 
-static void unclog_sink_stderr(unclog_data_int_t* data, va_list list) {
+static void unclog_sink_stderr(unclog_data_int_t* int_data, va_list list) {
+    unclog_data_t* data = int_data->da;
     char buffer[PATH_MAX] = {0};
     char* bufferpos = buffer;
 
-    uint32_t details = data->sink->common.details;
+    uint32_t details = int_data->sink->common.details;
 
     if (details & UNCLOG_OPT_TIMESTAMP) {
         struct tm time;
-        gmtime_r(&data->now.tv_sec, &time);
+        gmtime_r(&int_data->now.tv_sec, &time);
 
         char timebuffer[64];
         int size = strftime(timebuffer, 64, "%Y-%m-%d %H:%M:%S", &time);

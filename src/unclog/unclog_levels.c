@@ -4,27 +4,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+// clang-format off
 unclog_levels_t unclog_levels[] = {
-    {UNCLOG_LEVEL_FATAL, "Fatal", 'F'}, {UNCLOG_LEVEL_CRITICAL, "Critical", 'C'},
-    {UNCLOG_LEVEL_ERROR, "Error", 'E'}, {UNCLOG_LEVEL_WARNING, "Warning", 'W'},
-    {UNCLOG_LEVEL_INFO, "Info", 'I'},   {UNCLOG_LEVEL_DEBUG, "Debug", 'D'},
-    {UNCLOG_LEVEL_TRACE, "Trace", 'T'}, {0, NULL, '\0'},
+    {UNCLOG_LEVEL_FATAL, "Fatal", 'F'},
+    {UNCLOG_LEVEL_CRITICAL, "Critical", 'C'},
+    {UNCLOG_LEVEL_ERROR, "Error", 'E'},
+    {UNCLOG_LEVEL_WARNING, "Warning", 'W'},
+    {UNCLOG_LEVEL_INFO, "Info", 'I'},
+    {UNCLOG_LEVEL_DEBUG, "Debug", 'D'},
+    {UNCLOG_LEVEL_TRACE, "Trace", 'T'},
+    {-1, NULL, '\0'},
 };
 
-typedef struct unclog_details_s {
-    uint32_t detail;
-    const char* name;
-} unclog_details_t;
-
-static unclog_details_t unclog_details[] = {
-    {UNCLOG_OPT_LEVEL, "Level"},
+unclog_details_t unclog_details[] = {
     {UNCLOG_OPT_TIMESTAMP, "Time"},
+    {UNCLOG_OPT_LEVEL, "Level"},
     {UNCLOG_OPT_SOURCE, "Source"},
     {UNCLOG_OPT_FILE, "File"},
     {UNCLOG_OPT_LINE, "Line"},
     {UNCLOG_OPT_MESSAGE, "Message"},
     {-1, NULL},
 };
+// clang-format on
 
 int unclog_level_tolevel(const char* value) {
     unclog_levels_t* l = unclog_levels;

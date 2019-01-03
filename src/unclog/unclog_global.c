@@ -11,6 +11,8 @@ static const char* unclog_ini_files[] = {
 };
 
 void unclog_global_dump_config(unclog_global_t* g) {
+    return;
+
     fprintf(stderr, "g->defaults.level: %s\n", unclog_level_tostr(g->defaults.level));
     char* detailsstr = unclog_details_tostr(g->defaults.details);
     fprintf(stderr, "g->defaults.details: %s\n", detailsstr);
@@ -25,7 +27,8 @@ void unclog_global_dump_config(unclog_global_t* g) {
         fprintf(stderr, "g->sink[%s].level: %s\n", sink->sink,
                 unclog_level_tostr(sink->common.level));
         detailsstr = unclog_details_tostr(sink->common.details);
-        fprintf(stderr, "g->sink[%s].details: %s\n", sink->sink, detailsstr);
+        fprintf(stderr, "g->sink[%s].details: %04X | %s\n", sink->sink, sink->common.details,
+                detailsstr);
         free(detailsstr);
         unclog_keyvalue_t* kv = sink->values;
         for (; kv != NULL; kv = kv->next) {

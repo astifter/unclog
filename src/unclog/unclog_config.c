@@ -56,7 +56,7 @@ static void unclog_defaults_handler(void* g, const char* name, const char* value
 int unclog_ini_handler(void* g, const char* section, const char* name, const char* value) {
     unclog_global_t* global = g;
 
-    fprintf(stderr, "%s.%s: %s\n", section, name, value);
+    // fprintf(stderr, "%s.%s: %s\n", section, name, value);
     if (MATCH(section, "Defaults")) {
         unclog_defaults_handler(global, name, value);
         return 0;
