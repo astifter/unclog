@@ -9,8 +9,8 @@
 #include <string.h>
 
 const unclog_values_t unclog_defaults = {
-	.level = UNCLOG_LEVEL_WARNING,
-	.details = (UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_LEVEL | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE),
+    .level = UNCLOG_LEVEL_WARNING,
+    .details = (UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_LEVEL | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE),
 };
 
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
@@ -50,11 +50,11 @@ void unclog_deinit(void) {
 void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_sink_log_t sink_cb) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
-	unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
-	if (sink == NULL) {
-		sink = unclog_sink_create(settings, name);
-	}
-	sink->log = sink_cb;
+    unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
+    if (sink == NULL) {
+        sink = unclog_sink_create(settings, name);
+    }
+    sink->log = sink_cb;
 
     pthread_rwlock_unlock(&unclog_mutex);
 }

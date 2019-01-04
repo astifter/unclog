@@ -7,7 +7,8 @@
 #include <time.h>
 
 typedef struct unclog_source_s {
-    int level; // this data structure is cast from unclog_t so the first item has to be an int level;
+    int level;  // this data structure is cast from unclog_t so the first item has to be an int
+                // level;
     int active;
 
     char* source;

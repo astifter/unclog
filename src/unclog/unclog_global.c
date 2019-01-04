@@ -40,7 +40,7 @@ void unclog_global_dump_config(unclog_global_t* global) {
 unclog_global_t* unclog_global_create(const char* config, int usefile) {
     unclog_global_t* g = malloc(sizeof(unclog_global_t));
     memset(g, 0, sizeof(unclog_global_t));
-	memcpy(&g->defaults, &unclog_defaults, sizeof(unclog_values_t));
+    memcpy(&g->defaults, &unclog_defaults, sizeof(unclog_values_t));
 
     if (usefile == 1) {
         const char** f = unclog_ini_files;
