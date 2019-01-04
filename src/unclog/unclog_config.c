@@ -35,8 +35,9 @@ static int unclog_common_handler(unclog_values_t* v, const char* name, const cha
     return 1;
 }
 
-static void unclog_defaults_handler(void* g, const char* name, const char* value) {
-    unclog_global_t* global = g;
+static void unclog_defaults_handler(void* data, const char* name, const char* value) {
+    unclog_global_t* global = data;
+
     if (unclog_common_handler(&global->defaults, name, value)) return;
     if (MATCH(name, "Sinks")) {
         char* buffer = strdup(value);
@@ -44,7 +45,7 @@ static void unclog_defaults_handler(void* g, const char* name, const char* value
         char* token = strtok_r(buffer, ",", &token_save);
         while (token != NULL) {
             unclog_sink_t* sink = unclog_sink_create(&global->defaults, token);
-            unclog_global_sink_add(g, sink);
+            unclog_global_sink_add(global, sink);
             token = strtok_r(NULL, ",", &token_save);
         }
         free(buffer);
@@ -53,8 +54,8 @@ static void unclog_defaults_handler(void* g, const char* name, const char* value
     }
 }
 
-int unclog_ini_handler(void* g, const char* section, const char* name, const char* value) {
-    unclog_global_t* global = g;
+int unclog_ini_handler(void* data, const char* section, const char* name, const char* value) {
+    unclog_global_t* global = data;
 
     // fprintf(stderr, "%s.%s: %s\n", section, name, value);
     if (MATCH(section, "Defaults")) {
@@ -68,12 +69,12 @@ int unclog_ini_handler(void* g, const char* section, const char* name, const cha
 
     unclog_sink_t* sink = unclog_global_sink_get(global, section);
     if (sink != NULL) {
-        if (!unclog_common_handler(&sink->common, name, value))
+        if (!unclog_common_handler(&sink->settings, name, value))
             unclog_sink_add_keyvalue(sink, name, value);
         return 0;
     }
 
-    unclog_source_t* source = unclog_source_create(&global->defaults, section);
+    unclog_source_t* source = unclog_source_create(global->defaults.level, section);
     source->level = unclog_level_tolevel(value);
     unclog_global_source_add(global, source);
 

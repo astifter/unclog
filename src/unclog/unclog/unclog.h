@@ -4,6 +4,7 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,6 +28,9 @@ typedef struct unclog_data_s {
     const char* fi;
     const char* fu;
     unsigned int li;
+
+    struct timespec no;
+    struct unclog_sink_s* si;
 } unclog_data_t;
 
 unclog_t* unclog_open(const char* source);

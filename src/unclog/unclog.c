@@ -8,6 +8,11 @@
 #include <stdio.h>
 #include <string.h>
 
+const unclog_values_t unclog_defaults = {
+	.level = UNCLOG_LEVEL_WARNING,
+	.details = (UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_LEVEL | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE),
+};
+
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
 unclog_global_t* unclog_global = NULL;
 
@@ -42,6 +47,18 @@ void unclog_deinit(void) {
     pthread_rwlock_unlock(&unclog_mutex);
 }
 
+void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_sink_log_t sink_cb) {
+    pthread_rwlock_wrlock(&unclog_mutex);
+
+	unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
+	if (sink == NULL) {
+		sink = unclog_sink_create(settings, name);
+	}
+	sink->log = sink_cb;
+
+    pthread_rwlock_unlock(&unclog_mutex);
+}
+
 unclog_t* unclog_open(const char* source) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
@@ -49,7 +66,7 @@ unclog_t* unclog_open(const char* source) {
 
     unclog_source_t* handle = unclog_global_source_get(unclog_global, source);
     if (handle == NULL) {
-        handle = unclog_source_create(&unclog_global->defaults, source);
+        handle = unclog_source_create(unclog_global->defaults.level, source);
         unclog_global_source_add(unclog_global, handle);
     }
     handle->active++;
@@ -65,19 +82,18 @@ void unclog_log(unclog_data_t data, ...) {
 
     if (data.le > data.ha->level) return;
 
-    unclog_data_int_t di = {.da = &data};
-    clock_gettime(CLOCK_REALTIME, &di.now);
+    clock_gettime(CLOCK_REALTIME, &data.no);
 
     pthread_rwlock_rdlock(&unclog_mutex);
     unclog_sink_t* sink = unclog_global->sinks;
     for (; sink != NULL; sink = sink->next) {
         if (sink->log == NULL) continue;
-        if (data.le > sink->common.level) continue;
+        if (data.le > sink->settings.level) continue;
 
         va_list al;
         va_start(al, data);
-        di.sink = sink;
-        sink->log(&di, al);
+        data.si = sink;
+        sink->log(&data, al);
         va_end(al);
     }
     pthread_rwlock_unlock(&unclog_mutex);

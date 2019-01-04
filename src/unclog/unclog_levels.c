@@ -34,7 +34,7 @@ int unclog_level_tolevel(const char* value) {
             return l->level;
         }
     }
-    return UNCLOG_LEVEL_DEFAULT;
+    return unclog_defaults.level;
 }
 
 char unclog_level_tochar(int level) {
