@@ -13,4 +13,4 @@ gdb: unclog_tests_1
 	LD_LIBRARY_PATH=../unclog/.libs gdb ./.libs/unclog_tests_1
 
 valgrind: unclog_tests_1
-	LD_LIBRARY_PATH=../unclog/.libs valgrind --leak-check=full --track-origins=yes ./.libs/unclog_tests_1
+	LD_LIBRARY_PATH=../unclog/.libs valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./.libs/unclog_tests_1

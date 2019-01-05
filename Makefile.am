@@ -4,7 +4,7 @@ SUBDIRS = src
 EXTRA_DIST = autogen.sh unclog.doxygen README.md
 
 # valgrind testing
-valgrind gdb:
+valgrind gdb: check
 	$(MAKE) -C src/tests $@
 
 # documentation and formating
