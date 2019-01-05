@@ -74,9 +74,15 @@ int unclog_ini_handler(void* data, const char* section, const char* name, const 
         return 0;
     }
 
-    unclog_source_t* source = unclog_source_create(global->defaults.level, section);
-    source->level = unclog_level_tolevel(value);
-    unclog_global_source_add(global, source);
+    unclog_source_t* source = unclog_global_source_get(global, section);
+    if (source == NULL) {
+        source = unclog_source_create(global->defaults.level, section);
+        source->initialized = global->initialized;
+        unclog_global_source_add(global, source);
+    }
+    if (MATCH(name, "Level")) {
+        source->level = unclog_level_tolevel(value);
+    }
 
     return 0;
 }

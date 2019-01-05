@@ -53,6 +53,11 @@ void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_si
     unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
     if (sink == NULL) {
         sink = unclog_sink_create(settings, name);
+        unclog_global_sink_add(unclog_global, sink);
+    } else {
+        if (settings != NULL) memcpy(&sink->settings, settings, sizeof(unclog_values_t));
+        if (settings->level == 0) sink->settings.level = unclog_global->defaults.level;
+        if (settings->details == 0) sink->settings.details = unclog_global->defaults.details;
     }
     sink->log = sink_cb;
 

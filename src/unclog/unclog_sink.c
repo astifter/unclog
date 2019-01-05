@@ -74,7 +74,10 @@ unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name) {
     unclog_sink_t* handle = malloc(sizeof(unclog_sink_t));
     memset(handle, 0, sizeof(unclog_sink_t));
 
-    memcpy(&handle->settings, settings, sizeof(unclog_values_t));
+    if (settings != NULL)
+        memcpy(&handle->settings, settings, sizeof(unclog_values_t));
+    else
+        memcpy(&handle->settings, &unclog_global->defaults, sizeof(unclog_values_t));
     handle->sink = strdup(name);
 
     unclog_sink_list_t* l = unclog_default_sinks;
