@@ -16,9 +16,9 @@ const unclog_values_t unclog_defaults = {
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
 unclog_global_t* unclog_global = NULL;
 
-static void unclog_init_nolock(const char* config, int usefile) {
+static void unclog_init_nolock(const char* config, int usefile, int initialized) {
     if (unclog_global == NULL) {
-        unclog_global = unclog_global_create(config, usefile);
+        unclog_global = unclog_global_create(config, usefile, initialized);
     }
 }
 
@@ -32,11 +32,11 @@ void unclog_init(const char* config) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
     unclog_deinit_nolock();
-    unclog_init_nolock(config, 0);
+    unclog_init_nolock(config, 0, 1);
 
     pthread_rwlock_unlock(&unclog_mutex);
 
-    unclog_global_dump_config(unclog_global);
+    // unclog_global_dump_config(unclog_global);
 }
 
 void unclog_deinit(void) {
@@ -57,12 +57,14 @@ void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_si
     sink->log = sink_cb;
 
     pthread_rwlock_unlock(&unclog_mutex);
+
+    // unclog_global_dump_config(unclog_global);
 }
 
 unclog_t* unclog_open(const char* source) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
-    unclog_init_nolock(NULL, 1);
+    unclog_init_nolock(NULL, 1, 0);
 
     unclog_source_t* handle = unclog_global_source_get(unclog_global, source);
     if (handle == NULL) {
@@ -73,7 +75,7 @@ unclog_t* unclog_open(const char* source) {
 
     pthread_rwlock_unlock(&unclog_mutex);
 
-    unclog_global_dump_config(unclog_global);
+    // unclog_global_dump_config(unclog_global);
     return (unclog_t*)handle;
 }
 
@@ -107,13 +109,13 @@ void unclog_close(unclog_t* public_handle) {
 
     handle->active--;
     int has_active_handles;
-    if (handle->active == 0) {
+    if (handle->active == 0 && handle->initialized == 0) {
         has_active_handles = unclog_global_source_remove(unclog_global, handle);
     } else {
         has_active_handles = 1;
     }
 
-    if (!has_active_handles) {
+    if (!has_active_handles && unclog_global->initialized != 1) {
         unclog_deinit_nolock();
     }
 

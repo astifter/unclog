@@ -11,8 +11,6 @@ static const char* unclog_ini_files[] = {
 };
 
 void unclog_global_dump_config(unclog_global_t* global) {
-    return;
-
     fprintf(stderr, "global->defaults.level: %s\n", unclog_level_tostr(global->defaults.level));
     char* detailsstr = unclog_details_tostr(global->defaults.details);
     fprintf(stderr, "global->defaults.details: %s\n", detailsstr);
@@ -37,10 +35,11 @@ void unclog_global_dump_config(unclog_global_t* global) {
     }
 }
 
-unclog_global_t* unclog_global_create(const char* config, int usefile) {
+unclog_global_t* unclog_global_create(const char* config, int usefile, int initialized) {
     unclog_global_t* g = malloc(sizeof(unclog_global_t));
     memset(g, 0, sizeof(unclog_global_t));
     memcpy(&g->defaults, &unclog_defaults, sizeof(unclog_values_t));
+    g->initialized = initialized;
 
     if (usefile == 1) {
         const char** f = unclog_ini_files;

@@ -10,6 +10,7 @@ typedef struct unclog_source_s {
     int level;  // this data structure is cast from unclog_t so the first item has to be an int
                 // level;
     int active;
+    int initialized;
 
     char* source;
     struct unclog_source_s* next;
@@ -43,6 +44,7 @@ struct unclog_sink_s {
 typedef struct unclog_global_s {
     unclog_values_t defaults;
     int sinks_defined;
+    int initialized;
 
     unclog_source_t* sources;
     unclog_sink_t* sinks;
@@ -52,7 +54,7 @@ extern const unclog_values_t unclog_defaults;
 
 int unclog_ini_handler(void* data, const char* section, const char* name, const char* value);
 
-unclog_global_t* unclog_global_create(const char* config, int usefile);
+unclog_global_t* unclog_global_create(const char* config, int usefile, int initialized);
 void* unclog_global_destroy(unclog_global_t* global);
 
 void unclog_global_source_add(unclog_global_t* global, unclog_source_t* source);
