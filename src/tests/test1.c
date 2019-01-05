@@ -80,9 +80,9 @@ int main(int argc, char** argv) {
     fprintf(stderr, "----------------------------------------------------------------------\n");
 
     unclog_t* l1 = unclog_open("source1");
-    UL_ERR(l1, "fritz: %d", 45);
+    UL_ER(l1, "fritz: %d", 45);
     unclog_t* l2 = unclog_open("source2");
-    UL_TRA(l2, "herbert");
+    UL_TR(l2, "herbert");
     unclog_close(l1);
     unclog_close(l2);
     fprintf(stderr, "----------------------------------------------------------------------\n");
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     int i = 0;
     while (shutdown == 0) {
-        UL_ERR(l, "logging %d", i);
+        UL_ER(l, "logging %d", i);
         i++;
     }
     clock_gettime(CLOCK_MONOTONIC, &stop);

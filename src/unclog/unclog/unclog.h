@@ -50,13 +50,13 @@ void unclog_close(unclog_t* handle);
                 ##__VA_ARGS__);                                                            \
     }
 
-#define UL_FAT(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_FATAL, ##__VA_ARGS__);
-#define UL_CRI(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_CRITICAL, ##__VA_ARGS__);
-#define UL_ERR(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_ERROR, ##__VA_ARGS__);
-#define UL_WAR(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_WARNING, ##__VA_ARGS__);
-#define UL_INF(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_INFO, ##__VA_ARGS__);
-#define UL_DEB(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_DEBUG, ##__VA_ARGS__);
-#define UL_TRA(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_TRACE, ##__VA_ARGS__);
+#define UL_FA(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_FATAL, ##__VA_ARGS__);
+#define UL_CR(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_CRITICAL, ##__VA_ARGS__);
+#define UL_ER(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_ERROR, ##__VA_ARGS__);
+#define UL_WA(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_WARNING, ##__VA_ARGS__);
+#define UL_IN(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_INFO, ##__VA_ARGS__);
+#define UL_DE(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_DEBUG, ##__VA_ARGS__);
+#define UL_TR(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_TRACE, ##__VA_ARGS__);
 
 #ifdef __cplusplus
 }
