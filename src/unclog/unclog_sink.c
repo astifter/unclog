@@ -18,6 +18,7 @@ static void unclog_sink_stderr(unclog_data_t* data, va_list list) {
     char* bufferpos = buffer;
 
     uint32_t details = data->si->settings.details;
+    uint32_t needsspace = 0;
 
     if (details & UNCLOG_OPT_TIMESTAMP) {
         struct tm time;
@@ -28,37 +29,44 @@ static void unclog_sink_stderr(unclog_data_t* data, va_list list) {
 
         memcpy(buffer, timebuffer, size);
         bufferpos += size;
+        needsspace = 1;
     }
     if (details & UNCLOG_OPT_LEVEL) {
-        bufferpos += stringappend(bufferpos, " < >");
+        if (needsspace) *(bufferpos++) = ' ';
+        bufferpos += stringappend(bufferpos, "< >");
         *(bufferpos - 2) = unclog_level_tochar(data->le);
+        needsspace = 1;
     }
     if (details & UNCLOG_OPT_SOURCE) {
-        *(bufferpos++) = ' ';
+        if (needsspace) *(bufferpos++) = ' ';
         bufferpos += stringappend(bufferpos, ((unclog_source_t*)data->ha)->source);
-        *(bufferpos++) = ':';
+        needsspace = 1;
     }
     if (details & UNCLOG_OPT_FILE) {
-        *(bufferpos++) = ' ';
+        if (needsspace) *(bufferpos++) = ' ';
         bufferpos += stringappend(bufferpos, data->fi);
+        needsspace = 1;
     }
     if (details & UNCLOG_OPT_LINE) {
-        *(bufferpos++) = ':';
+        if (needsspace) {
+            if (details & UNCLOG_OPT_FILE)
+                *(bufferpos++) = ':';
+            else
+                *(bufferpos++) = ' ';
+        }
         bufferpos += sprintf(bufferpos, "%d", data->li);
-        *(bufferpos++) = ':';
-    } else {
-        *(bufferpos++) = ' ';
+        needsspace = 1;
     }
     if (details & UNCLOG_OPT_MESSAGE) {
-        *bufferpos = ' ';
-        bufferpos++;
+        if (needsspace) *(bufferpos++) = ' ';
         const char* fmt = va_arg(list, char*);
         bufferpos += vsprintf(bufferpos, fmt, list);
+        needsspace = 1;
     }
     *bufferpos = '\n';
     bufferpos++;
 
-    vfprintf(stderr, buffer, list);
+    fprintf(stderr, buffer);
 }
 
 typedef struct unclog_sink_list_s {

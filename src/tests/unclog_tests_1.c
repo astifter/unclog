@@ -279,10 +279,36 @@ static CU_TestInfo logging_complex_Tests[] = {
     DEFINE_TEST(logging_complex, loop1), DEFINE_TEST(logging_complex, loop2), CU_TEST_INFO_NULL,
 };
 
+static int logging_manual_Init(void) { return CUE_SUCCESS; }
+
+static void logging_manual_details(void) {
+    fprintf(stderr, "\n");
+    for (int i = 0; i <= UNCLOG_OPT_MAXIMUM; i++) {
+        char* detailsstr = unclog_details_tostr(i);
+        fprintf(stderr, "DETAILS: %d | %s\n", i, detailsstr);
+        free(detailsstr);
+
+        unclog_t* logger = unclog_open("main");
+        unclog_sink_t* sink = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
+        sink->settings.details = i;
+        sink->settings.level = UNCLOG_LEVEL_TRACE;
+
+        for (unclog_levels_t* s = unclog_levels; s->name != NULL; s++) {
+            UNCLOG(logger, s->level, "herbert");
+        }
+    }
+}
+
+static CU_TestInfo logging_manual_Tests[] = {
+    DEFINE_TEST(logging_manual, details), CU_TEST_INFO_NULL,
+};
+
 static CU_SuiteInfo suites[] = {
     DEFINE_SUITE(initialization),
     DEFINE_SUITE_EXT(logging_simple, logging_simple_Init, logging_simple_Deinit),
-    DEFINE_SUITE(logging_complex), CU_SUITE_INFO_NULL,
+    DEFINE_SUITE(logging_complex),
+    DEFINE_SUITE(logging_manual),
+    CU_SUITE_INFO_NULL,
 };
 
 int main(int argc, char** argv) {
