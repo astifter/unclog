@@ -1,5 +1,7 @@
 AM_CFLAGS = --std=c99 -Wall -Wextra -pedantic -I../unclog -lcunit
 
+EXTRA_DIST = unclog.ini
+
 noinst_PROGRAMS = example1
 
 example1_LDADD = ../unclog/libunclog.la
