@@ -7,6 +7,9 @@ EXTRA_DIST = autogen.sh unclog.doxygen README.md
 valgrind gdb: check
 	$(MAKE) -C src/tests $@
 
+examples: check
+	$(MAKE) -C src/examples $@
+
 # documentation and formating
 html-local: format documentation/html/index.html
 

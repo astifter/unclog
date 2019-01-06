@@ -43,5 +43,6 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/tests/Makefile
                  src/inih/Makefile
-                 src/unclog/Makefile])
+                 src/unclog/Makefile
+                 src/examples/Makefile])
 AC_OUTPUT

@@ -1,1 +1,1 @@
-SUBDIRS = inih unclog tests
+SUBDIRS = inih unclog tests examples
