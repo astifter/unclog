@@ -32,10 +32,10 @@ Details=Time,Source,Message,Level
 # the full details set would be Time,Source,File,Line,Message,Level
 
 # define which sinks are configured for message processing
-Sinks=libunclog_stderr.so
+Sinks=stderr
 
-# now configure sink libunclog_stderr.so to have level Debug
-[libunclog_stderr.so]
+# now configure sink stderr to have level Debug
+[stderr]
 Level=Debug
 
 # configure source main to have level Trace
@@ -50,7 +50,7 @@ When no configuration files are found or found files do not specify the setting 
 [Defaults]
 Level=Warning
 Details=Time,Source,Message,Level
-Sinks=libunclog_stderr.so
+Sinks=stderr
 ```
 
 ### Usage
@@ -81,3 +81,9 @@ int main(int argc, char** argv) {
 ## The Name
 
 I googled nclog (for new C logging library) and got results for unclog. Seemed like a good name, and since then *Bob's your unclog*.
+
+## Migration Notes
+
+### V0.1 to V0.2
+
+- Renamed internal source libunclog_stderr.so to stderr.

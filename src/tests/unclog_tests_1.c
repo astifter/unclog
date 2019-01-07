@@ -48,7 +48,7 @@ static void initialization_open_close(void) {
     CU_ASSERT_PTR_EQUAL(handle1, handle2);
     CU_ASSERT(source->active == 2);
 
-    check_sink("libunclog_stderr.so", unclog_defaults.level, unclog_defaults.details);
+    check_sink("stderr", unclog_defaults.level, unclog_defaults.details);
 
     unclog_close(handle1);
     CU_ASSERT(source->active == 1);
@@ -66,13 +66,13 @@ static void initialization_configuration_levels(void) {
         CU_ASSERT(unclog_global->defaults.level == l->level);
 
         for (unclog_levels_t* n = unclog_levels; n->name != NULL; n++) {
-            sprintf(buffer, "[Defaults]\nLevel=%s\n[libunclog_stderr.so]\nLevel=%s\n", l->name,
+            sprintf(buffer, "[Defaults]\nLevel=%s\n[stderr]\nLevel=%s\n", l->name,
                     n->name);
             unclog_init(buffer);
             CU_ASSERT(unclog_global != NULL);
             CU_ASSERT(unclog_global->defaults.level == l->level);
 
-            unclog_sink_t* s = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
+            unclog_sink_t* s = unclog_global_sink_get(unclog_global, "stderr");
             CU_ASSERT(s != NULL);
             CU_ASSERT(s->settings.level == n->level);
 
@@ -92,7 +92,7 @@ static void initialization_configuration_levels(void) {
             CU_ASSERT(s != NULL);
             CU_ASSERT(s->settings.level == n->level);
 
-            s = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
+            s = unclog_global_sink_get(unclog_global, "stderr");
             CU_ASSERT(s == NULL);
         }
     }
@@ -289,7 +289,7 @@ static void logging_manual_details(void) {
         free(detailsstr);
 
         unclog_t* logger = unclog_open("main");
-        unclog_sink_t* sink = unclog_global_sink_get(unclog_global, "libunclog_stderr.so");
+        unclog_sink_t* sink = unclog_global_sink_get(unclog_global, "stderr");
         sink->settings.details = i;
         sink->settings.level = UNCLOG_LEVEL_TRACE;
 

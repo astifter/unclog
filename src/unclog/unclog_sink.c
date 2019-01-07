@@ -75,7 +75,7 @@ typedef struct unclog_sink_list_s {
 } unclog_sink_list_t;
 
 static unclog_sink_list_t unclog_default_sinks[] = {
-    {"libunclog_stderr.so", unclog_sink_stderr}, {NULL, NULL},
+    {"stderr", unclog_sink_stderr}, {NULL, NULL},
 };
 
 unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name) {

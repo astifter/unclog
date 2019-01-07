@@ -55,7 +55,7 @@ unclog_global_t* unclog_global_create(const char* config, int usefile, int initi
     }
 
     if (g->sinks_defined == 0) {
-        unclog_sink_t* s = unclog_sink_create(&g->defaults, "libunclog_stderr.so");
+        unclog_sink_t* s = unclog_sink_create(&g->defaults, "stderr");
         unclog_global_sink_add(g, s);
     }
 
