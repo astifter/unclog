@@ -2,6 +2,9 @@
 #include <unclog/unclog.h>
 
 int main(int argc, char** argv) {
+    (void)argc;
+    (void)argv;
+
     // open a logging source "main", when this is called for the first time
     // during the process' lifetime the unclog.ini is searched for and
     // processed and unclog is initialized
