@@ -1,0 +1,535 @@
+$VAR1 = {
+          'ABI_DUMPER_VERSION' => '1.1',
+          'ABI_DUMP_VERSION' => '3.5',
+          'Arch' => 'x86',
+          'GccVersion' => '4.9.2',
+          'Headers' => {
+                         'unclog.h' => 1,
+                         'unclog_adv.h' => 1
+                       },
+          'Language' => 'C',
+          'LibraryName' => 'libunclog.so.1.0.0',
+          'LibraryVersion' => '0.1',
+          'NameSpaces' => {},
+          'Needed' => {
+                        'libc.so.6' => 1,
+                        'libpthread.so.0' => 1
+                      },
+          'PublicABI' => '1',
+          'Sources' => {
+                         'unclog.c' => 1
+                       },
+          'SymbolInfo' => {
+                            '1692' => {
+                                        'Header' => 'unclog_adv.h',
+                                        'Param' => {
+                                                     '0' => {
+                                                              'name' => 'config',
+                                                              'offset' => '0',
+                                                              'type' => '254'
+                                                            }
+                                                   },
+                                        'Return' => '1',
+                                        'ShortName' => 'unclog_init',
+                                        'Source' => 'unclog.c',
+                                        'SourceLine' => '31'
+                                      },
+                            '1781' => {
+                                        'Header' => 'unclog_adv.h',
+                                        'Return' => '1',
+                                        'ShortName' => 'unclog_deinit',
+                                        'Source' => 'unclog.c',
+                                        'SourceLine' => '42'
+                                      },
+                            '1830' => {
+                                        'Header' => 'unclog_adv.h',
+                                        'Param' => {
+                                                     '0' => {
+                                                              'name' => 'name',
+                                                              'offset' => '0',
+                                                              'type' => '254'
+                                                            },
+                                                     '1' => {
+                                                              'name' => 'settings',
+                                                              'offset' => '4',
+                                                              'type' => '1954'
+                                                            },
+                                                     '2' => {
+                                                              'name' => 'sink_cb',
+                                                              'offset' => '8',
+                                                              'type' => '530'
+                                                            }
+                                                   },
+                                        'Return' => '1',
+                                        'ShortName' => 'unclog_sink_register',
+                                        'Source' => 'unclog.c',
+                                        'SourceLine' => '50'
+                                      },
+                            '1960' => {
+                                        'Header' => 'unclog.h',
+                                        'Param' => {
+                                                     '0' => {
+                                                              'name' => 'source',
+                                                              'offset' => '0',
+                                                              'type' => '254'
+                                                            }
+                                                   },
+                                        'Return' => '391',
+                                        'ShortName' => 'unclog_open',
+                                        'Source' => 'unclog.c',
+                                        'SourceLine' => '69'
+                                      },
+                            '2084' => {
+                                        'Header' => 'unclog.h',
+                                        'Param' => {
+                                                     '0' => {
+                                                              'name' => 'data',
+                                                              'offset' => '0',
+                                                              'type' => '476'
+                                                            },
+                                                     '1' => {
+                                                              'type' => '-1'
+                                                            }
+                                                   },
+                                        'Return' => '1',
+                                        'ShortName' => 'unclog_log',
+                                        'Source' => 'unclog.c',
+                                        'SourceLine' => '87'
+                                      },
+                            '2191' => {
+                                        'Header' => 'unclog.h',
+                                        'Param' => {
+                                                     '0' => {
+                                                              'name' => 'public_handle',
+                                                              'offset' => '0',
+                                                              'type' => '391'
+                                                            }
+                                                   },
+                                        'Return' => '1',
+                                        'ShortName' => 'unclog_close',
+                                        'Source' => 'unclog.c',
+                                        'SourceLine' => '109'
+                                      }
+                          },
+          'SymbolVersion' => {},
+          'Symbols' => {
+                         'libunclog.so.1.0.0' => {
+                                                   '_fini' => 1,
+                                                   '_init' => 1,
+                                                   'ini_parse' => 1,
+                                                   'ini_parse_file' => 1,
+                                                   'ini_parse_stream' => 1,
+                                                   'ini_parse_string' => 1,
+                                                   'stringappend' => 1,
+                                                   'unclog_close' => 1,
+                                                   'unclog_defaults' => -8,
+                                                   'unclog_deinit' => 1,
+                                                   'unclog_details' => -56,
+                                                   'unclog_details_todetail' => 1,
+                                                   'unclog_details_tostr' => 1,
+                                                   'unclog_global' => -4,
+                                                   'unclog_global_create' => 1,
+                                                   'unclog_global_destroy' => 1,
+                                                   'unclog_global_dump_config' => 1,
+                                                   'unclog_global_sink_add' => 1,
+                                                   'unclog_global_sink_get' => 1,
+                                                   'unclog_global_source_add' => 1,
+                                                   'unclog_global_source_get' => 1,
+                                                   'unclog_global_source_remove' => 1,
+                                                   'unclog_ini_handler' => 1,
+                                                   'unclog_init' => 1,
+                                                   'unclog_level_tochar' => 1,
+                                                   'unclog_level_tolevel' => 1,
+                                                   'unclog_level_tostr' => 1,
+                                                   'unclog_levels' => -96,
+                                                   'unclog_log' => 1,
+                                                   'unclog_open' => 1,
+                                                   'unclog_sink_add_keyvalue' => 1,
+                                                   'unclog_sink_create' => 1,
+                                                   'unclog_sink_destroy' => 1,
+                                                   'unclog_sink_register' => 1,
+                                                   'unclog_source_create' => 1,
+                                                   'unclog_source_destroy' => 1
+                                                 }
+                       },
+          'Target' => 'unix',
+          'TypeInfo' => {
+                          '-1' => {
+                                    'Name' => '...',
+                                    'Type' => 'Intrinsic'
+                                  },
+                          '1' => {
+                                   'Name' => 'void',
+                                   'Type' => 'Intrinsic'
+                                 },
+                          '158' => {
+                                     'BaseType' => '62',
+                                     'Header' => 'types.h',
+                                     'Line' => '139',
+                                     'Name' => '__time_t',
+                                     'PrivateABI' => 1,
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '182' => {
+                                     'BaseType' => '62',
+                                     'Header' => 'types.h',
+                                     'Line' => '175',
+                                     'Name' => '__syscall_slong_t',
+                                     'PrivateABI' => 1,
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '193' => {
+                                     'BaseType' => '199',
+                                     'Name' => 'char*',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   },
+                          '1954' => {
+                                      'BaseType' => '606',
+                                      'Name' => 'unclog_values_t*',
+                                      'Size' => '4',
+                                      'Type' => 'Pointer'
+                                    },
+                          '199' => {
+                                     'Name' => 'char',
+                                     'Size' => '1',
+                                     'Type' => 'Intrinsic'
+                                   },
+                          '217' => {
+                                     'Header' => 'time.h',
+                                     'Line' => '120',
+                                     'Memb' => {
+                                                 '0' => {
+                                                          'name' => 'tv_sec',
+                                                          'offset' => '0',
+                                                          'type' => '158'
+                                                        },
+                                                 '1' => {
+                                                          'name' => 'tv_nsec',
+                                                          'offset' => '4',
+                                                          'type' => '182'
+                                                        }
+                                               },
+                                     'Name' => 'struct timespec',
+                                     'PrivateABI' => 1,
+                                     'Size' => '8',
+                                     'Type' => 'Struct'
+                                   },
+                          '254' => {
+                                     'BaseType' => '260',
+                                     'Name' => 'char const*',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   },
+                          '260' => {
+                                     'BaseType' => '199',
+                                     'Name' => 'char const',
+                                     'Size' => '1',
+                                     'Type' => 'Const'
+                                   },
+                          '265' => {
+                                     'Header' => 'unclog.h',
+                                     'Line' => '23',
+                                     'Memb' => {
+                                                 '0' => {
+                                                          'name' => 'level',
+                                                          'offset' => '0',
+                                                          'type' => '37'
+                                                        }
+                                               },
+                                     'Name' => 'struct unclog_s',
+                                     'Size' => '4',
+                                     'Type' => 'Struct'
+                                   },
+                          '290' => {
+                                     'BaseType' => '265',
+                                     'Header' => 'unclog.h',
+                                     'Line' => '23',
+                                     'Name' => 'unclog_t',
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '301' => {
+                                     'Header' => 'unclog.h',
+                                     'Line' => '25',
+                                     'Memb' => {
+                                                 '0' => {
+                                                          'name' => 'ha',
+                                                          'offset' => '0',
+                                                          'type' => '391'
+                                                        },
+                                                 '1' => {
+                                                          'name' => 'le',
+                                                          'offset' => '4',
+                                                          'type' => '37'
+                                                        },
+                                                 '2' => {
+                                                          'name' => 'fi',
+                                                          'offset' => '8',
+                                                          'type' => '254'
+                                                        },
+                                                 '3' => {
+                                                          'name' => 'fu',
+                                                          'offset' => '12',
+                                                          'type' => '254'
+                                                        },
+                                                 '4' => {
+                                                          'name' => 'li',
+                                                          'offset' => '16',
+                                                          'type' => '55'
+                                                        },
+                                                 '5' => {
+                                                          'name' => 'no',
+                                                          'offset' => '20',
+                                                          'type' => '217'
+                                                        },
+                                                 '6' => {
+                                                          'name' => 'si',
+                                                          'offset' => '28',
+                                                          'type' => '470'
+                                                        }
+                                               },
+                                     'Name' => 'struct unclog_data_s',
+                                     'Size' => '32',
+                                     'Type' => 'Struct'
+                                   },
+                          '37' => {
+                                    'Name' => 'int',
+                                    'Size' => '4',
+                                    'Type' => 'Intrinsic'
+                                  },
+                          '391' => {
+                                     'BaseType' => '290',
+                                     'Name' => 'unclog_t*',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   },
+                          '397' => {
+                                     'Header' => 'unclog_int.h',
+                                     'Line' => '35',
+                                     'Memb' => {
+                                                 '0' => {
+                                                          'name' => 'settings',
+                                                          'offset' => '0',
+                                                          'type' => '606'
+                                                        },
+                                                 '1' => {
+                                                          'name' => 'values',
+                                                          'offset' => '8',
+                                                          'type' => '784'
+                                                        },
+                                                 '2' => {
+                                                          'name' => 'log',
+                                                          'offset' => '12',
+                                                          'type' => '530'
+                                                        },
+                                                 '3' => {
+                                                          'name' => 'sink',
+                                                          'offset' => '16',
+                                                          'type' => '193'
+                                                        },
+                                                 '4' => {
+                                                          'name' => 'next',
+                                                          'offset' => '20',
+                                                          'type' => '470'
+                                                        }
+                                               },
+                                     'Name' => 'struct unclog_sink_s',
+                                     'PrivateABI' => 1,
+                                     'Size' => '24',
+                                     'Type' => 'Struct'
+                                   },
+                          '470' => {
+                                     'BaseType' => '397',
+                                     'Name' => 'struct unclog_sink_s*',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   },
+                          '476' => {
+                                     'BaseType' => '301',
+                                     'Header' => 'unclog.h',
+                                     'Line' => '34',
+                                     'Name' => 'unclog_data_t',
+                                     'Size' => '32',
+                                     'Type' => 'Typedef'
+                                   },
+                          '487' => {
+                                     'BaseType' => '498',
+                                     'Header' => 'stdarg.h',
+                                     'Line' => '40',
+                                     'Name' => '__gnuc_va_list',
+                                     'PrivateABI' => 1,
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '498' => {
+                                     'BaseType' => '199',
+                                     'Name' => '__builtin_va_list',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   },
+                          '508' => {
+                                     'BaseType' => '487',
+                                     'Header' => 'stdarg.h',
+                                     'Line' => '98',
+                                     'Name' => 'va_list',
+                                     'PrivateABI' => 1,
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '519' => {
+                                     'BaseType' => '55',
+                                     'Header' => 'stdint.h',
+                                     'Line' => '51',
+                                     'Name' => 'uint32_t',
+                                     'PrivateABI' => 1,
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '530' => {
+                                     'BaseType' => '541',
+                                     'Header' => 'unclog_adv.h',
+                                     'Line' => '11',
+                                     'Name' => 'unclog_sink_log_t',
+                                     'Size' => '4',
+                                     'Type' => 'Typedef'
+                                   },
+                          '541' => {
+                                     'Name' => 'void(*)(unclog_data_t*, va_list)',
+                                     'Param' => {
+                                                  '0' => {
+                                                           'type' => '563'
+                                                         },
+                                                  '1' => {
+                                                           'type' => '508'
+                                                         }
+                                                },
+                                     'Return' => '1',
+                                     'Size' => '4',
+                                     'Type' => 'FuncPtr'
+                                   },
+                          '55' => {
+                                    'Name' => 'unsigned int',
+                                    'Size' => '4',
+                                    'Type' => 'Intrinsic'
+                                  },
+                          '563' => {
+                                     'BaseType' => '476',
+                                     'Name' => 'unclog_data_t*',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   },
+                          '569' => {
+                                     'Header' => 'unclog_adv.h',
+                                     'Line' => '13',
+                                     'Memb' => {
+                                                 '0' => {
+                                                          'name' => 'level',
+                                                          'offset' => '0',
+                                                          'type' => '37'
+                                                        },
+                                                 '1' => {
+                                                          'name' => 'details',
+                                                          'offset' => '4',
+                                                          'type' => '519'
+                                                        }
+                                               },
+                                     'Name' => 'struct unclog_values_s',
+                                     'Size' => '8',
+                                     'Type' => 'Struct'
+                                   },
+                          '606' => {
+                                     'BaseType' => '569',
+                                     'Header' => 'unclog_adv.h',
+                                     'Line' => '16',
+                                     'Name' => 'unclog_values_t',
+                                     'Size' => '8',
+                                     'Type' => 'Typedef'
+                                   },
+                          '62' => {
+                                    'Name' => 'long',
+                                    'Size' => '4',
+                                    'Type' => 'Intrinsic'
+                                  },
+                          '707' => {
+                                     'Header' => 'unclog_int.h',
+                                     'Line' => '27',
+                                     'Memb' => {
+                                                 '0' => {
+                                                          'name' => 'key',
+                                                          'offset' => '0',
+                                                          'type' => '193'
+                                                        },
+                                                 '1' => {
+                                                          'name' => 'value',
+                                                          'offset' => '4',
+                                                          'type' => '193'
+                                                        },
+                                                 '2' => {
+                                                          'name' => 'next',
+                                                          'offset' => '8',
+                                                          'type' => '756'
+                                                        }
+                                               },
+                                     'Name' => 'struct unclog_keyvalue_s',
+                                     'PrivateABI' => 1,
+                                     'Size' => '12',
+                                     'Type' => 'Struct'
+                                   },
+                          '756' => {
+                                     'BaseType' => '707',
+                                     'Name' => 'struct unclog_keyvalue_s*',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   },
+                          '762' => {
+                                     'BaseType' => '707',
+                                     'Header' => 'unclog_int.h',
+                                     'Line' => '31',
+                                     'Name' => 'unclog_keyvalue_t',
+                                     'PrivateABI' => 1,
+                                     'Size' => '12',
+                                     'Type' => 'Typedef'
+                                   },
+                          '784' => {
+                                     'BaseType' => '762',
+                                     'Name' => 'unclog_keyvalue_t*',
+                                     'Size' => '4',
+                                     'Type' => 'Pointer'
+                                   }
+                        },
+          'UndefinedSymbols' => {
+                                  'libunclog.so.1.0.0' => {
+                                                            '_ITM_deregisterTMCloneTable' => 0,
+                                                            '_ITM_registerTMCloneTable' => 0,
+                                                            '_Jv_RegisterClasses' => 0,
+                                                            '__ctype_b_loc@GLIBC_2.3' => 0,
+                                                            '__cxa_finalize@GLIBC_2.1.3' => 0,
+                                                            '__gmon_start__' => 0,
+                                                            '__strdup@GLIBC_2.0' => 0,
+                                                            'access@GLIBC_2.0' => 0,
+                                                            'clock_gettime@GLIBC_2.17' => 0,
+                                                            'fclose@GLIBC_2.1' => 0,
+                                                            'fgets@GLIBC_2.0' => 0,
+                                                            'fopen@GLIBC_2.1' => 0,
+                                                            'fprintf@GLIBC_2.0' => 0,
+                                                            'free@GLIBC_2.0' => 0,
+                                                            'gmtime_r@GLIBC_2.0' => 0,
+                                                            'malloc@GLIBC_2.0' => 0,
+                                                            'memcpy@GLIBC_2.0' => 0,
+                                                            'pthread_rwlock_rdlock@GLIBC_2.1' => 0,
+                                                            'pthread_rwlock_unlock@GLIBC_2.1' => 0,
+                                                            'pthread_rwlock_wrlock@GLIBC_2.1' => 0,
+                                                            'sprintf@GLIBC_2.0' => 0,
+                                                            'stderr@GLIBC_2.0' => 0,
+                                                            'strchr@GLIBC_2.0' => 0,
+                                                            'strcmp@GLIBC_2.0' => 0,
+                                                            'strftime@GLIBC_2.0' => 0,
+                                                            'strncpy@GLIBC_2.0' => 0,
+                                                            'vsprintf@GLIBC_2.0' => 0
+                                                          }
+                                },
+          'WordSize' => '4'
+        };
