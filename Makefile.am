@@ -32,10 +32,10 @@ format:
 documentation/html/index.html: unclog.doxygen src/unclog/*.c src/unclog/*.h README.md
 	doxygen $< 
 
-abi-check: abi-dumps/unclog-$(VERSION).dump
+abi-check: abi-dumps/unclog-latest.dump
 	abi-compliance-checker -l unclog -old abi-dumps/unclog-$(PREVIOUS_VERSION).dump -new $<
 
-abi-dumps/unclog-$(VERSION).dump: ./src/unclog/.libs/libunclog.so
+abi-dumps/unclog-latest.dump: ./src/unclog/.libs/libunclog.so
 	abi-dumper -o $@ -vnum $(VERSION) -public-headers ./src/unclog/unclog $<
 
 ./src/unclog/.libs/libunclog.so: check
