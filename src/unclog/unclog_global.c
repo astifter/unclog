@@ -35,40 +35,50 @@ void unclog_global_dump_config(unclog_global_t* global) {
     }
 }
 
-unclog_global_t* unclog_global_create(const char* config, int usefile, int initialized) {
-    unclog_global_t* g = malloc(sizeof(unclog_global_t));
-    memset(g, 0, sizeof(unclog_global_t));
-    memcpy(&g->defaults, &unclog_defaults, sizeof(unclog_values_t));
-    g->initialized = initialized;
+void unclog_global_configure(unclog_global_t* global, const char* config, int usefile,
+                             int initialized) {
+    memcpy(&global->defaults, &unclog_defaults, sizeof(unclog_values_t));
+    global->sinks_defined = 0;
+    global->initialized = initialized;
 
     if (usefile == 1) {
         const char** f = unclog_ini_files;
         for (; *f != NULL; f++) {
             if (access(*f, R_OK) != 0) continue;
-            ini_parse(*f, unclog_ini_handler, g);
+            ini_parse(*f, unclog_ini_handler, global);
             break;
         }
     } else {
         if (config != NULL) {
-            ini_parse_string(config, unclog_ini_handler, g);
+            ini_parse_string(config, unclog_ini_handler, global);
         }
     }
 
-    if (g->sinks_defined == 0) {
-        unclog_sink_t* s = unclog_sink_create(&g->defaults, "stderr");
-        unclog_global_sink_add(g, s);
+    if (global->sinks_defined == 0) {
+        unclog_sink_t* s = unclog_sink_create(&global->defaults, "stderr");
+        unclog_global_sink_add(global, s);
     }
+}
 
+unclog_global_t* unclog_global_create(const char* config, int usefile, int initialized) {
+    unclog_global_t* g = malloc(sizeof(unclog_global_t));
+    memset(g, 0, sizeof(unclog_global_t));
+
+    unclog_global_configure(g, config, usefile, initialized);
     return g;
 }
 
-void* unclog_global_destroy(unclog_global_t* global) {
-    unclog_sink_t* sink = global->sinks;
-    while (sink != NULL) {
-        unclog_sink_t* d = sink;
-        sink = sink->next;
+void* unclog_global_sink_clear(unclog_global_t* global) {
+    while (global->sinks != NULL) {
+        unclog_sink_t* d = global->sinks;
+        global->sinks = global->sinks->next;
         unclog_sink_destroy(d);
     }
+}
+
+void* unclog_global_destroy(unclog_global_t* global) {
+    unclog_global_sink_clear(global);
+
     unclog_source_t* source = global->sources;
     while (source != NULL) {
         unclog_source_t* d = source;

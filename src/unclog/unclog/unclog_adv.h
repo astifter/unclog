@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 void unclog_init(const char* config);
+void unclog_reinit(const char* config);
 void unclog_deinit(void);
 
 typedef void (*unclog_sink_log_t)(unclog_data_t* d, va_list l);

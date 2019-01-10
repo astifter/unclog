@@ -47,6 +47,17 @@ void unclog_deinit(void) {
     pthread_rwlock_unlock(&unclog_mutex);
 }
 
+void unclog_reinit(const char* config) {
+    pthread_rwlock_wrlock(&unclog_mutex);
+
+    // unclog_global_dump_config(unclog_global);
+    unclog_global_sink_clear(unclog_global);
+    unclog_global_configure(unclog_global, config, 0, 1);
+    // unclog_global_dump_config(unclog_global);
+
+    pthread_rwlock_unlock(&unclog_mutex);
+}
+
 void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_sink_log_t sink_cb) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
