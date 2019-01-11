@@ -51,7 +51,7 @@ void unclog_reinit(const char* config) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
     // unclog_global_dump_config(unclog_global);
-    unclog_global_sink_clear(unclog_global);
+    unclog_global_sink_clear(unclog_global, 0);
     unclog_global_configure(unclog_global, config, 0, 1);
     // unclog_global_dump_config(unclog_global);
 
@@ -66,11 +66,14 @@ void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_si
         sink = unclog_sink_create(settings, name);
         unclog_global_sink_add(unclog_global, sink);
     } else {
-        if (settings != NULL) memcpy(&sink->settings, settings, sizeof(unclog_values_t));
-        if (settings->level == 0) sink->settings.level = unclog_global->defaults.level;
-        if (settings->details == 0) sink->settings.details = unclog_global->defaults.details;
+        if (settings != NULL) {
+            memcpy(&sink->settings, settings, sizeof(unclog_values_t));
+            if (settings->level == 0) sink->settings.level = unclog_global->defaults.level;
+            if (settings->details == 0) sink->settings.details = unclog_global->defaults.details;
+        }
     }
     sink->log = sink_cb;
+    sink->registered = 1;
 
     pthread_rwlock_unlock(&unclog_mutex);
 

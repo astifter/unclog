@@ -36,6 +36,7 @@ struct unclog_sink_s {
     unclog_values_t settings;
     unclog_keyvalue_t* values;
     unclog_sink_log_t log;
+    int registered;
 
     char* sink;
     struct unclog_sink_s* next;
@@ -65,7 +66,7 @@ int unclog_global_source_remove(unclog_global_t* global, unclog_source_t* source
 
 void unclog_global_sink_add(unclog_global_t* global, unclog_sink_t* source);
 unclog_sink_t* unclog_global_sink_get(unclog_global_t* global, const char* sink);
-void* unclog_global_sink_clear(unclog_global_t* global);
+void unclog_global_sink_clear(unclog_global_t* global, int include_registered);
 
 void unclog_global_dump_config(unclog_global_t* global);
 

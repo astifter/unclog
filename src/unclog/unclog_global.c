@@ -68,16 +68,29 @@ unclog_global_t* unclog_global_create(const char* config, int usefile, int initi
     return g;
 }
 
-void* unclog_global_sink_clear(unclog_global_t* global) {
-    while (global->sinks != NULL) {
-        unclog_sink_t* d = global->sinks;
-        global->sinks = global->sinks->next;
-        unclog_sink_destroy(d);
+void unclog_global_sink_clear(unclog_global_t* global, int include_registered) {
+    unclog_sink_t* s = global->sinks;
+    unclog_sink_t* p = NULL;
+
+    while (s != NULL) {
+        if (s->registered == 0 || include_registered) {
+            if (p == NULL) {
+                global->sinks = s->next;
+            } else {
+                p->next = s->next;
+            }
+            unclog_sink_t* d = s;
+            s = s->next;
+            unclog_sink_destroy(d);
+        } else {
+            p = s;
+            s = s->next;
+        }
     }
 }
 
 void* unclog_global_destroy(unclog_global_t* global) {
-    unclog_global_sink_clear(global);
+    unclog_global_sink_clear(global, 1);
 
     unclog_source_t* source = global->sources;
     while (source != NULL) {
@@ -108,6 +121,7 @@ int unclog_global_source_remove(unclog_global_t* global, unclog_source_t* source
     int has_active_handles = 0;
     unclog_source_t* s = global->sources;
     unclog_source_t* p = NULL;
+
     while (s != NULL) {
         if (s == source) {
             if (p == NULL) {
