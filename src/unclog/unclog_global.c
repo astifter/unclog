@@ -36,6 +36,15 @@ void unclog_global_configure(unclog_global_t* global, const char* config, int us
     memcpy(&global->defaults, &unclog_defaults, sizeof(unclog_values_t));
     global->sinks_defined = 0;
     global->initialized = initialized;
+    for (unclog_sink_t* s = global->sinks; s != NULL; s = s->i->next) {
+        memcpy(&s->settings, &unclog_defaults, sizeof(unclog_values_t));
+        for (unclog_keyvalue_t* k = s->values; k != NULL; k = k->next) {
+            unclog_keyvalue_destroy(k);
+        }
+    }
+    for (unclog_source_t* s = global->sources; s != NULL; s = s->next) {
+        s->level = unclog_defaults.level;
+    }
 
     if (usefile == 1) {
         const char** f = unclog_ini_files;

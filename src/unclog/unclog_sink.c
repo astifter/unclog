@@ -95,10 +95,22 @@ unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name) {
     return handle;
 }
 
-void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* value) {
+unclog_keyvalue_t* unclog_keyvalue_create(const char* key, const char* value) {
     unclog_keyvalue_t* kv = malloc(sizeof(unclog_keyvalue_t));
     kv->key = strdup(key);
     kv->value = strdup(value);
+
+    return kv;
+}
+
+void unclog_keyvalue_destroy(unclog_keyvalue_t* v) {
+    free(v->key);
+    free(v->value);
+    free(v);
+}
+
+void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* value) {
+    unclog_keyvalue_t* kv = unclog_keyvalue_create(key, value);
 
     kv->next = sink->values;
     sink->values = kv;
@@ -109,9 +121,7 @@ void unclog_sink_destroy(unclog_sink_t* sink) {
     while (kv != NULL) {
         unclog_keyvalue_t* d = kv;
         kv = kv->next;
-        free(d->key);
-        free(d->value);
-        free(d);
+        unclog_keyvalue_destroy(d);
     }
     free(sink->i->sink);
     free(sink->i);

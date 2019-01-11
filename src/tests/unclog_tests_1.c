@@ -5,14 +5,21 @@
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
 
-static void check_sink(const char* name, int level, uint32_t details) {
+static void check_sink(const char* name, int level, uint32_t details, int allow_null_log) {
     unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
     CU_ASSERT_PTR_NOT_NULL(sink);
     CU_ASSERT(sink->settings.level == level);
     CU_ASSERT(sink->settings.details == details);
     CU_ASSERT_PTR_NULL(sink->values);
-    CU_ASSERT_PTR_NOT_NULL(sink->i->methods.log);
+    if (!allow_null_log) CU_ASSERT_PTR_NOT_NULL(sink->i->methods.log);
     CU_ASSERT_STRING_EQUAL(sink->i->sink, name);
+}
+
+static void check_source(const char* name, int level) {
+    unclog_source_t* source = unclog_global_source_get(unclog_global, name);
+    CU_ASSERT_PTR_NOT_NULL(source);
+    CU_ASSERT(source->level == level);
+    CU_ASSERT_STRING_EQUAL(source->source, name);
 }
 
 #define DEFINE_TEST(s, t) \
@@ -34,6 +41,7 @@ static void initialization_open_close(void) {
     unclog_t* handle1 = unclog_open("herbert");
     CU_ASSERT_PTR_NOT_NULL(unclog_global);
     CU_ASSERT_PTR_NOT_NULL(handle1);
+    check_source("herbert", unclog_defaults.level);
 
     unclog_source_t* source = (unclog_source_t*)handle1;
     CU_ASSERT(source->level == unclog_defaults.level);
@@ -46,7 +54,7 @@ static void initialization_open_close(void) {
     CU_ASSERT_PTR_EQUAL(handle1, handle2);
     CU_ASSERT(source->active == 2);
 
-    check_sink("stderr", unclog_defaults.level, unclog_defaults.details);
+    check_sink("stderr", unclog_defaults.level, unclog_defaults.details, 0);
 
     unclog_close(handle1);
     CU_ASSERT(source->active == 1);
@@ -146,8 +154,22 @@ static void initialization_configuration_reinit(void) {
     unclog_sink_register("newsink", NULL, (unclog_sink_methods_t){0});
     unclog_global_dump_config(unclog_global);
 
+    CU_ASSERT(unclog_global->defaults.level == UNCLOG_LEVEL_DEBUG);
+    CU_ASSERT(unclog_global->defaults.details == UNCLOG_OPT_TIMESTAMP);
+    check_sink("stderr", UNCLOG_LEVEL_TRACE, UNCLOG_OPT_MESSAGE, 0);
+    check_sink("newsink", UNCLOG_LEVEL_DEBUG, UNCLOG_OPT_TIMESTAMP, 1);
+    check_source("logger1", UNCLOG_LEVEL_ERROR);
+    check_source("logger2", UNCLOG_LEVEL_DEBUG);
+
     unclog_reinit("");
     unclog_global_dump_config(unclog_global);
+
+    CU_ASSERT(unclog_global->defaults.level == unclog_defaults.level);
+    CU_ASSERT(unclog_global->defaults.details == unclog_defaults.details);
+    check_sink("stderr", unclog_defaults.level, unclog_defaults.details, 0);
+    check_sink("newsink", unclog_defaults.level, unclog_defaults.details, 1);
+    check_source("logger1", unclog_defaults.level);
+    check_source("logger2", unclog_defaults.level);
 
     unclog_close(logger1);
     unclog_close(logger2);
@@ -209,7 +231,7 @@ static int logging_simple_Deinit(void) {
 }
 
 static void logging_simple_check_sink(void) {
-    check_sink("Testing", logging_sink_settings.level, logging_sink_settings.details);
+    check_sink("Testing", logging_sink_settings.level, logging_sink_settings.details, 0);
     fprintf(stderr, "\n");
     unclog_global_dump_config(unclog_global);
 }

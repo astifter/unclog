@@ -58,6 +58,9 @@ void unclog_global_dump_config(unclog_global_t* global);
 unclog_source_t* unclog_source_create(int level, const char* name);
 void unclog_source_destroy(unclog_source_t* source);
 
+unclog_keyvalue_t* unclog_keyvalue_create(const char* key, const char* value);
+void unclog_keyvalue_destroy(unclog_keyvalue_t* v);
+
 unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name);
 void unclog_sink_destroy(unclog_sink_t* sink);
 void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* value);
