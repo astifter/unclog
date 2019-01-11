@@ -176,12 +176,42 @@ static void initialization_configuration_reinit(void) {
     unclog_deinit();
 }
 
+static uint32_t initialization_configuration_register_called = 0;
+void initialization_configuration_register_init(unclog_sink_t* s) {
+    (void)s;
+    initialization_configuration_register_called |= 0x01;
+}
+void initialization_configuration_register_log(unclog_data_t* d, va_list l) {
+    (void)d;
+    (void)l;
+    initialization_configuration_register_called |= 0x04;
+}
+void initialization_configuration_register_deinit(unclog_sink_t* s) {
+    (void)s;
+    initialization_configuration_register_called |= 0x02;
+}
+
+void initialization_configuration_register(void) {
+    unclog_t* log = unclog_open("herbert");
+    unclog_values_t settings = {.level = UNCLOG_LEVEL_TRACE};
+    unclog_sink_register("newsink", &settings,
+                         (unclog_sink_methods_t){initialization_configuration_register_init,
+                                                 initialization_configuration_register_log,
+                                                 initialization_configuration_register_deinit});
+    CU_ASSERT(initialization_configuration_register_called == 0x01);
+    UL_CR(log, "fritz");
+    CU_ASSERT(initialization_configuration_register_called == 0x05);
+    unclog_deinit();
+    CU_ASSERT(initialization_configuration_register_called == 0x07);
+}
+
 static CU_TestInfo initialization_Tests[] = {
     DEFINE_TEST(initialization, open_close),
     DEFINE_TEST(initialization, configuration_levels),
     DEFINE_TEST(initialization, configuration_details_all),
     DEFINE_TEST(initialization, configuration_details_random),
     DEFINE_TEST(initialization, configuration_reinit),
+    DEFINE_TEST(initialization, configuration_register),
     CU_TEST_INFO_NULL,
 };
 
@@ -279,6 +309,7 @@ static void logging_complex_setup(int level_source, int level_sink) {
         .level = level_sink,
     };
     unclog_sink_register("Testing", &settings, (unclog_sink_methods_t){.log = logging_sink});
+    check_sink("Testing", level_sink, unclog_defaults.details, 0);
 
     logging_complex_logger = unclog_open("testing");
     logging_complex_logger->level = level_source;

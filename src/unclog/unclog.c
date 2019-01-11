@@ -60,15 +60,18 @@ void unclog_sink_register(const char* name, unclog_values_t* settings,
     if (sink == NULL) {
         sink = unclog_sink_create(settings, name);
         unclog_global_sink_add(unclog_global, sink);
-    } else {
-        if (settings != NULL) {
-            memcpy(&sink->settings, settings, sizeof(unclog_values_t));
-            if (settings->level == 0) sink->settings.level = unclog_global->defaults.level;
-            if (settings->details == 0) sink->settings.details = unclog_global->defaults.details;
-        }
     }
+
+    if (settings != NULL) {
+        memcpy(&sink->settings, settings, sizeof(unclog_values_t));
+        if (settings->level == 0) sink->settings.level = unclog_global->defaults.level;
+        if (settings->details == 0) sink->settings.details = unclog_global->defaults.details;
+    }
+
     sink->i->methods = methods;
     sink->i->registered = 1;
+
+    if (sink->i->methods.init != NULL) sink->i->methods.init(sink);
 
     pthread_rwlock_unlock(&unclog_mutex);
 

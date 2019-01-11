@@ -117,6 +117,8 @@ void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* 
 }
 
 void unclog_sink_destroy(unclog_sink_t* sink) {
+    if (sink->i->methods.deinit != NULL) sink->i->methods.deinit(sink);
+
     unclog_keyvalue_t* kv = sink->values;
     while (kv != NULL) {
         unclog_keyvalue_t* d = kv;
