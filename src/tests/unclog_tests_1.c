@@ -66,8 +66,7 @@ static void initialization_configuration_levels(void) {
         CU_ASSERT(unclog_global->defaults.level == l->level);
 
         for (unclog_levels_t* n = unclog_levels; n->name != NULL; n++) {
-            sprintf(buffer, "[Defaults]\nLevel=%s\n[stderr]\nLevel=%s\n", l->name,
-                    n->name);
+            sprintf(buffer, "[Defaults]\nLevel=%s\n[stderr]\nLevel=%s\n", l->name, n->name);
             unclog_init(buffer);
             CU_ASSERT(unclog_global != NULL);
             CU_ASSERT(unclog_global->defaults.level == l->level);
@@ -131,11 +130,38 @@ static void initialization_configuration_details_random(void) {
     initialization_configuration_details_single(MAX, NULL);
 }
 
+static void initialization_configuration_reinit(void) {
+    fprintf(stderr, "\n");
+
+    unclog_init(
+        "[Defaults]\n"
+        "Level=Debug\n"
+        "Details=Time\n"
+        "Sinks=stderr,newsink\n"
+        "[stderr]\n"
+        "Level=Trace\n"
+        "Details=Message\n"
+        "[logger1]\n"
+        "Level=Error\n");
+    unclog_t* logger1 = unclog_open("logger1");
+    unclog_t* logger2 = unclog_open("logger2");
+    unclog_sink_register("newsink", NULL, NULL);
+    unclog_global_dump_config(unclog_global);
+
+    unclog_reinit("");
+    unclog_global_dump_config(unclog_global);
+
+    unclog_close(logger1);
+    unclog_close(logger2);
+    unclog_deinit();
+}
+
 static CU_TestInfo initialization_Tests[] = {
     DEFINE_TEST(initialization, open_close),
     DEFINE_TEST(initialization, configuration_levels),
     DEFINE_TEST(initialization, configuration_details_all),
     DEFINE_TEST(initialization, configuration_details_random),
+    DEFINE_TEST(initialization, configuration_reinit),
     CU_TEST_INFO_NULL,
 };
 
@@ -296,6 +322,7 @@ static void logging_manual_details(void) {
         for (unclog_levels_t* s = unclog_levels; s->name != NULL; s++) {
             UNCLOG(logger, s->level, "herbert");
         }
+        unclog_close(logger);
     }
 }
 

@@ -4,10 +4,10 @@ SUBDIRS = src
 EXTRA_DIST = autogen.sh unclog.doxygen README.md
 
 # valgrind testing
-valgrind gdb: check
+valgrind gdb: ./src/unclog/.libs/libunclog.so
 	$(MAKE) -C src/tests $@
 
-examples: check
+examples: ./src/unclog/.libs/libunclog.so
 	$(MAKE) -C src/examples $@
 
 # documentation and formating
@@ -38,4 +38,4 @@ abi-check: abi-dumps/unclog-latest.dump
 abi-dumps/unclog-latest.dump: ./src/unclog/.libs/libunclog.so
 	abi-dumper -o $@ -vnum $(VERSION) -public-headers ./src/unclog/unclog $<
 
-./src/unclog/.libs/libunclog.so: check
+./src/unclog/.libs/libunclog.so: all
