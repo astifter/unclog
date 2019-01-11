@@ -7,7 +7,7 @@ EXTRA_DIST = autogen.sh unclog.doxygen README.md
 valgrind gdb: ./src/unclog/.libs/libunclog.so
 	$(MAKE) -C src/tests $@
 
-examples: ./src/unclog/.libs/libunclog.so
+examples: check
 	$(MAKE) -C src/examples $@
 
 # documentation and formating

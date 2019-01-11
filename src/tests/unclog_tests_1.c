@@ -5,8 +5,6 @@
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>
 
-#include <stdlib.h>
-
 static void check_sink(const char* name, int level, uint32_t details) {
     unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
     CU_ASSERT_PTR_NOT_NULL(sink);

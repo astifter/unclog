@@ -2,10 +2,6 @@
 
 #include "unclog_int.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #define MATCH(n, v) (strcmp(n, v) == 0)
 
 static void unclog_level_handler(unclog_values_t* v, const char* value) {

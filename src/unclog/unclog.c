@@ -2,12 +2,6 @@
 
 #include "unclog_int.h"
 
-#include <limits.h>
-#include <pthread.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-
 const unclog_values_t unclog_defaults = {
     .level = UNCLOG_LEVEL_WARNING,
     .details = (UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_LEVEL | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE),

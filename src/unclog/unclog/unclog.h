@@ -3,7 +3,6 @@
 #define _POSIX_C_SOURCE 199309L
 
 #include <limits.h>
-#include <stddef.h>
 #include <time.h>
 
 #ifdef __cplusplus

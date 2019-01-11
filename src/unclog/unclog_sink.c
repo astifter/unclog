@@ -2,11 +2,6 @@
 
 #include "unclog_int.h"
 
-#include <linux/limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 size_t stringappend(char* dest, const char* src) {
     size_t size = strlen(src);
     memcpy(dest, src, size + 1);
@@ -75,7 +70,7 @@ typedef struct unclog_sink_list_s {
 } unclog_sink_list_t;
 
 static unclog_sink_list_t unclog_default_sinks[] = {
-    {"stderr", {NULL, unclog_sink_stderr, NULL}}, {NULL, NULL},
+    {"stderr", {NULL, unclog_sink_stderr, NULL}}, {NULL, {NULL}},
 };
 
 unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name) {

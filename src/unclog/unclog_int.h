@@ -2,9 +2,12 @@
 
 #include "unclog/unclog_adv.h"
 
-#include <stdarg.h>
-#include <stdint.h>
-#include <time.h>
+#include <linux/limits.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 typedef struct unclog_source_s {
     int level;  // this data structure is cast from unclog_t so the first item has to be an int

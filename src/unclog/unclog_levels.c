@@ -1,9 +1,5 @@
 #include "unclog_int.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 // clang-format off
 unclog_levels_t unclog_levels[] = {
     {UNCLOG_LEVEL_FATAL, "Fatal", 'F'},
