@@ -58,7 +58,8 @@ void unclog_reinit(const char* config) {
     pthread_rwlock_unlock(&unclog_mutex);
 }
 
-void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_sink_log_t sink_cb) {
+void unclog_sink_register(const char* name, unclog_values_t* settings,
+                          unclog_sink_methods_t methods) {
     pthread_rwlock_wrlock(&unclog_mutex);
 
     unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
@@ -72,8 +73,8 @@ void unclog_sink_register(const char* name, unclog_values_t* settings, unclog_si
             if (settings->details == 0) sink->settings.details = unclog_global->defaults.details;
         }
     }
-    sink->log = sink_cb;
-    sink->registered = 1;
+    sink->i->methods = methods;
+    sink->i->registered = 1;
 
     pthread_rwlock_unlock(&unclog_mutex);
 
@@ -107,14 +108,14 @@ void unclog_log(unclog_data_t data, ...) {
 
     pthread_rwlock_rdlock(&unclog_mutex);
     unclog_sink_t* sink = unclog_global->sinks;
-    for (; sink != NULL; sink = sink->next) {
-        if (sink->log == NULL) continue;
+    for (; sink != NULL; sink = sink->i->next) {
+        if (sink->i->methods.log == NULL) continue;
         if (data.le > sink->settings.level) continue;
 
         va_list al;
         va_start(al, data);
         data.si = sink;
-        sink->log(&data, al);
+        sink->i->methods.log(&data, al);
         va_end(al);
     }
     pthread_rwlock_unlock(&unclog_mutex);

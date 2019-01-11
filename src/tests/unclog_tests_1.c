@@ -13,8 +13,8 @@ static void check_sink(const char* name, int level, uint32_t details) {
     CU_ASSERT(sink->settings.level == level);
     CU_ASSERT(sink->settings.details == details);
     CU_ASSERT_PTR_NULL(sink->values);
-    CU_ASSERT_PTR_NOT_NULL(sink->log);
-    CU_ASSERT_STRING_EQUAL(sink->sink, name);
+    CU_ASSERT_PTR_NOT_NULL(sink->i->methods.log);
+    CU_ASSERT_STRING_EQUAL(sink->i->sink, name);
 }
 
 #define DEFINE_TEST(s, t) \
@@ -145,7 +145,7 @@ static void initialization_configuration_reinit(void) {
         "Level=Error\n");
     unclog_t* logger1 = unclog_open("logger1");
     unclog_t* logger2 = unclog_open("logger2");
-    unclog_sink_register("newsink", NULL, NULL);
+    unclog_sink_register("newsink", NULL, (unclog_sink_methods_t){0});
     unclog_global_dump_config(unclog_global);
 
     unclog_reinit("");
@@ -196,7 +196,8 @@ static int logging_simple_Init(void) {
     // unclog_global_dump_config(unclog_global);
     if (unclog_global == NULL) return CUE_SINIT_FAILED;
 
-    unclog_sink_register("Testing", &logging_sink_settings, logging_sink);
+    unclog_sink_register("Testing", &logging_sink_settings,
+                         (unclog_sink_methods_t){.log = logging_sink});
 
     return CUE_SUCCESS;
 }
@@ -257,7 +258,7 @@ static void logging_complex_setup(int level_source, int level_sink) {
     unclog_values_t settings = {
         .level = level_sink,
     };
-    unclog_sink_register("Testing", &settings, logging_sink);
+    unclog_sink_register("Testing", &settings, (unclog_sink_methods_t){.log = logging_sink});
 
     logging_complex_logger = unclog_open("testing");
     logging_complex_logger->level = level_source;

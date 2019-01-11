@@ -71,27 +71,29 @@ static void unclog_sink_stderr(unclog_data_t* data, va_list list) {
 
 typedef struct unclog_sink_list_s {
     const char* name;
-    unclog_sink_log_t log;
+    unclog_sink_methods_t methods;
 } unclog_sink_list_t;
 
 static unclog_sink_list_t unclog_default_sinks[] = {
-    {"stderr", unclog_sink_stderr}, {NULL, NULL},
+    {"stderr", {NULL, unclog_sink_stderr, NULL}}, {NULL, NULL},
 };
 
 unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name) {
     unclog_sink_t* handle = malloc(sizeof(unclog_sink_t));
     memset(handle, 0, sizeof(unclog_sink_t));
+    handle->i = malloc(sizeof(unclog_sink_internal_t));
+    memset(handle->i, 0, sizeof(unclog_sink_internal_t));
 
     if (settings != NULL)
         memcpy(&handle->settings, settings, sizeof(unclog_values_t));
     else
         memcpy(&handle->settings, &unclog_global->defaults, sizeof(unclog_values_t));
-    handle->sink = strdup(name);
+    handle->i->sink = strdup(name);
 
     unclog_sink_list_t* l = unclog_default_sinks;
     for (; l->name != NULL; l++) {
         if (strcmp(l->name, name) == 0) {
-            handle->log = l->log;
+            handle->i->methods = l->methods;
         }
     }
 
@@ -116,6 +118,7 @@ void unclog_sink_destroy(unclog_sink_t* sink) {
         free(d->value);
         free(d);
     }
-    free(sink->sink);
+    free(sink->i->sink);
+    free(sink->i);
     free(sink);
 }

@@ -21,16 +21,16 @@ void unclog_global_dump_config(unclog_global_t* global) {
                 unclog_level_tostr(source->level));
     }
     unclog_sink_t* sink = global->sinks;
-    for (; sink != NULL; sink = sink->next) {
-        fprintf(stderr, "global->sink[%s].level: %s\n", sink->sink,
+    for (; sink != NULL; sink = sink->i->next) {
+        fprintf(stderr, "global->sink[%s].level: %s\n", sink->i->sink,
                 unclog_level_tostr(sink->settings.level));
         detailsstr = unclog_details_tostr(sink->settings.details);
-        fprintf(stderr, "global->sink[%s].details: %04X | %s\n", sink->sink, sink->settings.details,
-                detailsstr);
+        fprintf(stderr, "global->sink[%s].details: %04X | %s\n", sink->i->sink,
+                sink->settings.details, detailsstr);
         free(detailsstr);
         unclog_keyvalue_t* kv = sink->values;
         for (; kv != NULL; kv = kv->next) {
-            fprintf(stderr, "global->sink[%s].%s: %s\n", sink->sink, kv->key, kv->value);
+            fprintf(stderr, "global->sink[%s].%s: %s\n", sink->i->sink, kv->key, kv->value);
         }
     }
 }
@@ -73,18 +73,18 @@ void unclog_global_sink_clear(unclog_global_t* global, int include_registered) {
     unclog_sink_t* p = NULL;
 
     while (s != NULL) {
-        if (s->registered == 0 || include_registered) {
+        if (s->i->registered == 0 || include_registered) {
             if (p == NULL) {
-                global->sinks = s->next;
+                global->sinks = s->i->next;
             } else {
-                p->next = s->next;
+                p->i->next = s->i->next;
             }
             unclog_sink_t* d = s;
-            s = s->next;
+            s = s->i->next;
             unclog_sink_destroy(d);
         } else {
             p = s;
-            s = s->next;
+            s = s->i->next;
         }
     }
 }
@@ -141,15 +141,15 @@ int unclog_global_source_remove(unclog_global_t* global, unclog_source_t* source
     return has_active_handles;
 }
 
-void unclog_global_sink_add(unclog_global_t* global, unclog_sink_t* source) {
-    source->next = global->sinks;
-    global->sinks = source;
+void unclog_global_sink_add(unclog_global_t* global, unclog_sink_t* sink) {
+    sink->i->next = global->sinks;
+    global->sinks = sink;
 }
 
 unclog_sink_t* unclog_global_sink_get(unclog_global_t* global, const char* sink) {
     unclog_sink_t* s = global->sinks;
-    for (; s != NULL; s = s->next) {
-        if (strcmp(s->sink, sink) == 0) return s;
+    for (; s != NULL; s = s->i->next) {
+        if (strcmp(s->i->sink, sink) == 0) return s;
     }
     return NULL;
 }
