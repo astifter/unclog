@@ -60,6 +60,7 @@ void unclog_source_destroy(unclog_source_t* source);
 
 unclog_keyvalue_t* unclog_keyvalue_create(const char* key, const char* value);
 void unclog_keyvalue_destroy(unclog_keyvalue_t* v);
+char* unclog_keyvalue_get(unclog_keyvalue_t* v, const char* key);
 
 unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name);
 void unclog_sink_destroy(unclog_sink_t* sink);

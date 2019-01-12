@@ -35,6 +35,7 @@ typedef struct unclog_sink_internal_s unclog_sink_internal_t;
 typedef struct unclog_sink_s {
     unclog_values_t settings;
     unclog_keyvalue_t* values;
+    void* data;
     unclog_sink_internal_t* i;
 } unclog_sink_t;
 

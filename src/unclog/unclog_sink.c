@@ -8,8 +8,7 @@ size_t stringappend(char* dest, const char* src) {
     return size;
 }
 
-static void unclog_sink_stderr(unclog_data_t* data, va_list list) {
-    char buffer[PATH_MAX] = {0};
+static size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_list list) {
     char* bufferpos = buffer;
 
     uint32_t details = data->si->settings.details;
@@ -61,7 +60,39 @@ static void unclog_sink_stderr(unclog_data_t* data, va_list list) {
     *bufferpos = '\n';
     bufferpos++;
 
+    return bufferpos - buffer;
+}
+
+static void unclog_sink_stderr(unclog_data_t* data, va_list list) {
+    char buffer[PATH_MAX] = {0};
+    unclog_sink_default(buffer, data, list);
     fprintf(stderr, buffer);
+}
+
+typedef struct unclog_sink_file_data_s { FILE* file; } unclog_sink_file_data_t;
+
+static void unclog_sink_file_init(unclog_sink_t* s) {
+    s->data = malloc(sizeof(unclog_sink_file_data_t));
+    memset(s->data, 0, sizeof(unclog_sink_file_data_t));
+
+    unclog_sink_file_data_t* d = s->data;
+    char* filename = unclog_keyvalue_get(s->values, "File");
+    if (filename != NULL) d->file = fopen(filename, "ab");
+}
+
+static void unclog_sink_file_log(unclog_data_t* data, va_list list) {
+    unclog_sink_file_data_t* d = data->si->data;
+    char buffer[PATH_MAX] = {0};
+    size_t size = unclog_sink_default(buffer, data, list);
+    fwrite(buffer, size, 1, d->file);
+}
+
+static void unclog_sink_file_deinit(unclog_sink_t* s) {
+    unclog_sink_file_data_t* d = s->data;
+    if (d->file != NULL) {
+        fclose(d->file);
+        free(d);
+    }
 }
 
 typedef struct unclog_sink_list_s {
@@ -70,7 +101,9 @@ typedef struct unclog_sink_list_s {
 } unclog_sink_list_t;
 
 static unclog_sink_list_t unclog_default_sinks[] = {
-    {"stderr", {NULL, unclog_sink_stderr, NULL}}, {NULL, {NULL}},
+    {"stderr", {NULL, unclog_sink_stderr, NULL}},
+    {"file", {unclog_sink_file_init, unclog_sink_file_log, unclog_sink_file_deinit}},
+    {NULL, {NULL}},
 };
 
 unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name) {
@@ -107,6 +140,15 @@ void unclog_keyvalue_destroy(unclog_keyvalue_t* v) {
     free(v->key);
     free(v->value);
     free(v);
+}
+
+char* unclog_keyvalue_get(unclog_keyvalue_t* v, const char* key) {
+    while (v != NULL) {
+        if (strcmp(v->key, key) == 0) {
+            return v->value;
+        }
+    }
+    return NULL;
 }
 
 void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* value) {

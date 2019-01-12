@@ -353,8 +353,16 @@ static void logging_complex_loop2(void) {
     }
 }
 
+static void logging_complex_file_sink(void) {
+    unclog_init("[Defaults]\nSinks=file\n[file]\nFile=unclog.log");
+    unclog_t* log = unclog_open("fritz");
+    UL_CR(log, "herbert");
+    unclog_deinit();
+}
+
 static CU_TestInfo logging_complex_Tests[] = {
-    DEFINE_TEST(logging_complex, loop1), DEFINE_TEST(logging_complex, loop2), CU_TEST_INFO_NULL,
+    DEFINE_TEST(logging_complex, loop1), DEFINE_TEST(logging_complex, loop2),
+    DEFINE_TEST(logging_complex, file_sink), CU_TEST_INFO_NULL,
 };
 
 static int logging_manual_Init(void) { return CUE_SUCCESS; }

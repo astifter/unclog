@@ -63,6 +63,10 @@ void unclog_global_configure(unclog_global_t* global, const char* config, int us
         unclog_sink_t* s = unclog_sink_create(&global->defaults, "stderr");
         unclog_global_sink_add(global, s);
     }
+
+    for (unclog_sink_t* s = global->sinks; s != NULL; s = s->i->next) {
+        if (s->i->methods.init != NULL) s->i->methods.init(s);
+    }
 }
 
 unclog_global_t* unclog_global_create(const char* config, int usefile, int initialized) {
