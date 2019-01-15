@@ -11,10 +11,11 @@ https://github.com/benhoyt/inih
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "ini.h"
-
+#include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+
+#include "ini.h"
 
 #if !INI_USE_STACK
 #include <stdlib.h>
