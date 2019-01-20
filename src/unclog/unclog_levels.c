@@ -24,8 +24,7 @@ unclog_details_t unclog_details[] = {
 // clang-format on
 
 int unclog_level_tolevel(const char* value) {
-    unclog_levels_t* l = unclog_levels;
-    for (; l->name != NULL; l++) {
+    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
         if (strcmp(l->name, value) == 0) {
             return l->level;
         }
@@ -34,24 +33,25 @@ int unclog_level_tolevel(const char* value) {
 }
 
 char unclog_level_tochar(int level) {
-    unclog_levels_t* l = unclog_levels;
-    for (; l->name != NULL; l++) {
-        if (level <= l->level) return l->shortname;
+    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
+        if (UNCLOG_LEVEL_COMPARE(level, l->level)) {
+            return l->shortname;
+        }
     }
     return 'M';
 }
 
 const char* unclog_level_tostr(int level) {
-    unclog_levels_t* l = unclog_levels;
-    for (; l->name != NULL; l++) {
-        if (level <= l->level) return l->name;
+    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
+        if (UNCLOG_LEVEL_COMPARE(level, l->level)) {
+            return l->name;
+        }
     }
     return "Minimum";
 }
 
 uint32_t unclog_details_todetail(const char* value) {
-    unclog_details_t* d = unclog_details;
-    for (; d->name != NULL; d++) {
+    for (unclog_details_t* d = unclog_details; d->name != NULL; d++) {
         if (strcmp(d->name, value) == 0) {
             return d->detail;
         }
@@ -71,8 +71,8 @@ char* unclog_details_tostr(uint32_t details) {
 
         if (next != 0) buffer += sprintf(buffer, ",");
         next = 1;
+
         buffer += sprintf(buffer, "%s", d->name);
     }
-
     return retval;
 }

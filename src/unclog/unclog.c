@@ -100,7 +100,7 @@ unclog_t* unclog_open(const char* source) {
 void unclog_log(unclog_data_t data, ...) {
     if (data.ha == NULL) return;
 
-    if (data.le > data.ha->level) return;
+    if (!UNCLOG_LEVEL_COMPARE(data.le, data.ha->level)) return;
 
     clock_gettime(CLOCK_REALTIME, &data.no);
 
@@ -108,7 +108,7 @@ void unclog_log(unclog_data_t data, ...) {
     unclog_sink_t* sink = unclog_global->sinks;
     for (; sink != NULL; sink = sink->i->next) {
         if (sink->i->methods.log == NULL) continue;
-        if (data.le > sink->settings.level) continue;
+        if (!UNCLOG_LEVEL_COMPARE(data.le, sink->settings.level)) continue;
 
         va_list al;
         va_start(al, data);

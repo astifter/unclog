@@ -18,6 +18,7 @@ extern "C" {
 #define UNCLOG_LEVEL_DEBUG 1200
 #define UNCLOG_LEVEL_TRACE 1400
 #define UNCLOG_LEVEL_MINIMUM INT_MAX
+#define UNCLOG_LEVEL_COMPARE(l, m) ((l) <= (m))
 
 typedef struct unclog_s { int level; } unclog_t;
 
@@ -42,11 +43,13 @@ void unclog_close(unclog_t* handle);
 
 #define UNCLOG(h, l, ...)                                                                  \
     {                                                                                      \
-        if (((l) <= (UNCLOG_LEVEL_CUTOFF)) && ((h) != NULL) && ((l) <= (h)->level))        \
+        if (UNCLOG_LEVEL_COMPARE(l, UNCLOG_LEVEL_CUTOFF) && ((h) != NULL) &&               \
+            UNCLOG_LEVEL_COMPARE(l, (h)->level)) {                                         \
             unclog_log(                                                                    \
                 (unclog_data_t){                                                           \
                     .ha = (h), .le = (l), .fi = __FILE__, .fu = __func__, .li = __LINE__}, \
                 ##__VA_ARGS__);                                                            \
+        }                                                                                  \
     }
 
 #define UL_FA(ha, ...) UNCLOG((ha), UNCLOG_LEVEL_FATAL, ##__VA_ARGS__);
