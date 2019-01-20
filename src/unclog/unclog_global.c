@@ -98,7 +98,7 @@ void unclog_global_sink_clear(unclog_global_t* global, int include_registered) {
     }
 }
 
-void* unclog_global_destroy(unclog_global_t* global) {
+void unclog_global_destroy(unclog_global_t* global) {
     unclog_global_sink_clear(global, 1);
 
     unclog_source_t* source = global->sources;
@@ -109,8 +109,6 @@ void* unclog_global_destroy(unclog_global_t* global) {
     }
 
     free(global);
-
-    return NULL;
 }
 
 void unclog_global_source_add(unclog_global_t* global, unclog_source_t* source) {

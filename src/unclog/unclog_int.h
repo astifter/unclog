@@ -10,8 +10,8 @@
 #include <unistd.h>
 
 typedef struct unclog_source_s {
-    int level;  // this data structure is cast from unclog_t so the first item has to be an int
-                // level;
+    int level;  // this data structure is cast from unclog_t so the first items has to be equal to
+                // unclog_t
     int active;
     int initialized;
 
@@ -41,7 +41,7 @@ extern const unclog_values_t unclog_defaults;
 int unclog_ini_handler(void* data, const char* section, const char* name, const char* value);
 
 unclog_global_t* unclog_global_create(const char* config, int usefile, int initialized);
-void* unclog_global_destroy(unclog_global_t* global);
+void unclog_global_destroy(unclog_global_t* global);
 void unclog_global_configure(unclog_global_t* global, const char* config, int usefile,
                              int initialized);
 

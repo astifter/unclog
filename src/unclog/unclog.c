@@ -18,7 +18,8 @@ static void unclog_init_nolock(const char* config, int usefile, int initialized)
 
 static void unclog_deinit_nolock(void) {
     if (unclog_global != NULL) {
-        unclog_global = unclog_global_destroy(unclog_global);
+        unclog_global_destroy(unclog_global);
+        unclog_global = NULL;
     }
 }
 
