@@ -37,6 +37,7 @@ typedef struct unclog_global_s {
 } unclog_global_t;
 
 extern const unclog_values_t unclog_defaults;
+extern const char* unclog_defaults_file;
 
 int unclog_ini_handler(void* data, const char* section, const char* name, const char* value);
 

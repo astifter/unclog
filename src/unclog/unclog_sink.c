@@ -77,6 +77,7 @@ static void unclog_sink_file_init(unclog_sink_t* s) {
 
     unclog_sink_file_data_t* d = s->data;
     char* filename = unclog_keyvalue_get(s->values, "File");
+    if (filename == NULL) filename = (char*)unclog_defaults_file;
     if (filename != NULL) d->file = fopen(filename, "ab");
 }
 

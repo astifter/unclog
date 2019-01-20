@@ -6,6 +6,7 @@ const unclog_values_t unclog_defaults = {
     .level = UNCLOG_LEVEL_WARNING,
     .details = (UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_LEVEL | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE),
 };
+const char* unclog_defaults_file = "unclog.log";
 
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
 unclog_global_t* unclog_global = NULL;
