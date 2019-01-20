@@ -28,8 +28,6 @@ typedef struct unclog_keyvalue_s {
     struct unclog_keyvalue_s* next;
 } unclog_keyvalue_t;
 
-typedef void (*unclog_sink_log_t)(unclog_data_t* d, va_list l);
-
 typedef struct unclog_sink_internal_s unclog_sink_internal_t;
 
 typedef struct unclog_sink_s {
@@ -40,6 +38,7 @@ typedef struct unclog_sink_s {
 } unclog_sink_t;
 
 typedef void (*unclog_sink_init_t)(unclog_sink_t* sink);
+typedef void (*unclog_sink_log_t)(unclog_data_t* d, va_list l);
 typedef void (*unclog_sink_deinit_t)(unclog_sink_t* sink);
 
 typedef struct unclog_sink_methods_s {
