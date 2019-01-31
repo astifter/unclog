@@ -75,7 +75,7 @@ static void unclog_sink_stderr_init(unclog_sink_t* s) {
 static void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
     char buffer[PATH_MAX] = {0};
     unclog_sink_default(buffer, data, list);
-    fprintf(stderr, "buffer\n");
+    fprintf(stderr, buffer);
     
     unclog_sink_stderr_data_t* d = data->si->data;
     d->messages++;

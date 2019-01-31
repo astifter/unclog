@@ -1,5 +1,4 @@
-/unclog_test_*
 /*.log
 /*.trs
 /.gdb_history
-/unclog_tests_1
+/unclog_tests_*
