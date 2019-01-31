@@ -9,6 +9,7 @@ unclog_levels_t unclog_levels[] = {
     {UNCLOG_LEVEL_INFO, "Info", 'I'},
     {UNCLOG_LEVEL_DEBUG, "Debug", 'D'},
     {UNCLOG_LEVEL_TRACE, "Trace", 'T'},
+    {UNCLOG_LEVEL_MINIMUM, "Minimum", 'M'},
     {-1, NULL, '\0'},
 };
 

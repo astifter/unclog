@@ -66,6 +66,7 @@ char* unclog_keyvalue_get(unclog_keyvalue_t* v, const char* key);
 unclog_sink_t* unclog_sink_create(unclog_values_t* settings, const char* name);
 void unclog_sink_destroy(unclog_sink_t* sink);
 void unclog_sink_add_keyvalue(unclog_sink_t* sink, const char* key, const char* value);
+uint64_t unclog_sink_stderr_get_num_messages();
 
 int unclog_level_tolevel(const char* value);
 char unclog_level_tochar(int level);

@@ -63,10 +63,32 @@ static size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_list lis
     return bufferpos - buffer;
 }
 
-static void unclog_sink_stderr(unclog_data_t* data, va_list list) {
+typedef struct unclog_sink_stderr_data_s {
+    uint64_t messages;
+} unclog_sink_stderr_data_t;
+
+static void unclog_sink_stderr_init(unclog_sink_t* s) {
+    s->data = malloc(sizeof(unclog_sink_stderr_data_t));
+    memset(s->data, 0, sizeof(unclog_sink_stderr_data_t));
+}
+
+static void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
     char buffer[PATH_MAX] = {0};
     unclog_sink_default(buffer, data, list);
-    fprintf(stderr, buffer);
+    fprintf(stderr, "buffer\n");
+    
+    unclog_sink_stderr_data_t* d = data->si->data;
+    d->messages++;
+}
+
+static void unclog_sink_stderr_deinit(unclog_sink_t* s) {
+    free(s->data);
+}
+
+uint64_t unclog_sink_stderr_get_num_messages() {
+    unclog_sink_t* s = unclog_global_sink_get(unclog_global, "stderr");
+    unclog_sink_stderr_data_t* d = s->data;
+    return d->messages;
 }
 
 typedef struct unclog_sink_file_data_s { FILE* file; } unclog_sink_file_data_t;
@@ -102,7 +124,7 @@ typedef struct unclog_sink_list_s {
 } unclog_sink_list_t;
 
 static unclog_sink_list_t unclog_default_sinks[] = {
-    {"stderr", {NULL, unclog_sink_stderr, NULL}},
+    {"stderr", {unclog_sink_stderr_init, unclog_sink_stderr_log, unclog_sink_stderr_deinit}},
     {"file", {unclog_sink_file_init, unclog_sink_file_log, unclog_sink_file_deinit}},
     {NULL, {NULL}},
 };
