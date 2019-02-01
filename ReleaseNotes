@@ -3,7 +3,7 @@ Release Notes
 --------------------------------------------------------------------------------
 Version 0.2-alpha - 2018-02-01 - Saint Brigid's Release
 
-	* Add checking of binary compatibility for API.
+    * Add checking of binary compatibility for API.
     * Renamed sink libunclog_stderr.so to stderr.
     * Added file sink.
     * Added sink init and deinit calls.
@@ -16,4 +16,4 @@ Version 0.2-alpha - 2018-02-01 - Saint Brigid's Release
 --------------------------------------------------------------------------------
 Version 0.1-alpha - 2018-01-06 - The Tree Kings Release
 
-	* Initial release.
+    * Initial release.
