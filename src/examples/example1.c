@@ -1,5 +1,5 @@
 // only one include file is needed for basic usage
-#include <unclog/unclog_adv.h>
+#include <unclog/unclog.h>
 
 int main(int argc, char** argv) {
     (void)argc;
