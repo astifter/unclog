@@ -11,25 +11,25 @@ examples: check
 	$(MAKE) -C src/examples $@
 
 # documentation and formating
-html-local: format documentation/html/index.html
+html-local: format docs/html/index.html
 
 install-html-local: html
 	install -d $(DESTDIR)$(docdir)
-	cp -r ./documentation/html/* $(DESTDIR)$(docdir)
+	cp -r ./docs/html/* $(DESTDIR)$(docdir)
 
 uninstall-local:
 	rm -rf $(DESTDIR)$(docdir)
 	rm -rf $(DESTDIR)$(includedir)/unclog
 
 clean-local:
-	rm -rf ./documentation/
+	rm -rf ./docs/
 
 format: 
 	SOURCES=$$(find src/unclog src/tests -name '*.c'); \
 	HEADERS=$$(find src/unclog src/tests -name '*.h'); \
 	clang-format-3.8 -i -style=file $${SOURCES} $${HEADERS}
 
-documentation/html/index.html: unclog.doxygen src/unclog/*.c src/unclog/*.h README.md
+docs/html/index.html: unclog.doxygen src/unclog/*.c src/unclog/*.h README.md
 	doxygen $< 
 
 abi-check: abi-dumps/unclog-latest.dump

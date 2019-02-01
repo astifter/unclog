@@ -21,6 +21,7 @@ Makefile
 /documentation/
 CUnitAutomated-Results.xml
 /compat_reports/
+/docs/doxygen_sqlite3.db
 
 *.orig
 *~

@@ -1,0 +1,26 @@
+var unclog__adv_8h =
+[
+    [ "unclog_keyvalue_s", "structunclog__keyvalue__s.html", "structunclog__keyvalue__s" ],
+    [ "unclog_sink_methods_s", "structunclog__sink__methods__s.html", "structunclog__sink__methods__s" ],
+    [ "unclog_sink_s", "structunclog__sink__s.html", "structunclog__sink__s" ],
+    [ "unclog_values_s", "structunclog__values__s.html", "structunclog__values__s" ],
+    [ "UNCLOG_OPT_FILE", "unclog__adv_8h.html#a67e77982cb3c4cb24779e7dce247e7b0", null ],
+    [ "UNCLOG_OPT_LEVEL", "unclog__adv_8h.html#aa0bf5bb528bcff69e25a12789bf4285d", null ],
+    [ "UNCLOG_OPT_LINE", "unclog__adv_8h.html#a7b71c4028dee121f27776ef0466cd623", null ],
+    [ "UNCLOG_OPT_MAXIMUM", "unclog__adv_8h.html#a97fbe85f0161d9c35412f4f79a5fb201", null ],
+    [ "UNCLOG_OPT_MESSAGE", "unclog__adv_8h.html#a06954bd4b788284a2e9c1a78ac691d4b", null ],
+    [ "UNCLOG_OPT_SOURCE", "unclog__adv_8h.html#acf402ebfecd116f63e6655dff375eb15", null ],
+    [ "UNCLOG_OPT_TIMESTAMP", "unclog__adv_8h.html#af4ecf075be1155045244b01c3eb2bbc1", null ],
+    [ "unclog_keyvalue_t", "unclog__adv_8h.html#a3b56d527b557a4f003a3bc5e35af9a99", null ],
+    [ "unclog_sink_deinit_t", "unclog__adv_8h.html#a80acdd1e97c0cbd1e361527da29cc342", null ],
+    [ "unclog_sink_init_t", "unclog__adv_8h.html#a72cac5c19b131323df13456c51d659b3", null ],
+    [ "unclog_sink_internal_t", "unclog__adv_8h.html#a60996bdc3a76e7a7785eed2e91792efd", null ],
+    [ "unclog_sink_log_t", "unclog__adv_8h.html#a6f5e3e65daec2501e36c978f99e7e212", null ],
+    [ "unclog_sink_methods_t", "unclog__adv_8h.html#ade7db2c3e7c8ebebce892a47f761723f", null ],
+    [ "unclog_sink_t", "unclog__adv_8h.html#aaaffed661f99764e4f5948e3a3262b56", null ],
+    [ "unclog_values_t", "unclog__adv_8h.html#a4de77d8fa60e31852b8994ae7661b2de", null ],
+    [ "unclog_deinit", "unclog__adv_8h.html#a8438d7debb9bf9f4dd6814b42dbd9125", null ],
+    [ "unclog_init", "unclog__adv_8h.html#a5fbfa952a110a335857f7eb388de440c", null ],
+    [ "unclog_reinit", "unclog__adv_8h.html#aea1b0f5475e4d18305f517e10fc04b55", null ],
+    [ "unclog_sink_register", "unclog__adv_8h.html#ad975138fc47bd0b6bc848d370688b4b0", null ]
+];
