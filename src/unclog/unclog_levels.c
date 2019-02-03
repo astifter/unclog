@@ -9,7 +9,6 @@ unclog_levels_t unclog_levels[] = {
     {UNCLOG_LEVEL_INFO, "Info", 'I'},
     {UNCLOG_LEVEL_DEBUG, "Debug", 'D'},
     {UNCLOG_LEVEL_TRACE, "Trace", 'T'},
-    {UNCLOG_LEVEL_MINIMUM, "Minimum", 'M'},
     {-1, NULL, '\0'},
 };
 
@@ -24,12 +23,6 @@ unclog_details_t unclog_details[] = {
 };
 // clang-format on
 
-static int unclog_level_shorten(int level) {
-    int r = (level - 1) / 200;
-    if (r > 7) return 7;
-    return r;
-}
-
 int unclog_level_tolevel(const char* value) {
     for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
         if (strcmp(l->name, value) == 0) {
@@ -39,15 +32,9 @@ int unclog_level_tolevel(const char* value) {
     return unclog_defaults.level;
 }
 
-char unclog_level_tochar(int level) {
-    int l = unclog_level_shorten(level);
-    return unclog_levels[l].shortname;
-}
+char unclog_level_tochar(int level) { return unclog_levels[level - 1].shortname; }
 
-const char* unclog_level_tostr(int level) {
-    int l = unclog_level_shorten(level);
-    return unclog_levels[l].name;
-}
+const char* unclog_level_tostr(int level) { return unclog_levels[level - 1].name; }
 
 uint32_t unclog_details_todetail(const char* value) {
     for (unclog_details_t* d = unclog_details; d->name != NULL; d++) {

@@ -34,6 +34,11 @@ typedef struct unclog_global_s {
 
     unclog_source_t* sources;
     unclog_sink_t* sinks;
+
+    pthread_mutex_t now_mutex;
+    struct timespec now;
+    char now_buffer[64];
+    size_t now_buffer_size;
 } unclog_global_t;
 
 extern const unclog_values_t unclog_defaults;
