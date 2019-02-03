@@ -24,6 +24,12 @@ unclog_details_t unclog_details[] = {
 };
 // clang-format on
 
+static int unclog_level_shorten(int level) {
+    int r = (level - 1) / 200;
+    if (r > 7) return 7;
+    return r;
+}
+
 int unclog_level_tolevel(const char* value) {
     for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
         if (strcmp(l->name, value) == 0) {
@@ -34,21 +40,13 @@ int unclog_level_tolevel(const char* value) {
 }
 
 char unclog_level_tochar(int level) {
-    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
-        if (UNCLOG_LEVEL_COMPARE(level, l->level)) {
-            return l->shortname;
-        }
-    }
-    return 'M';
+    int l = unclog_level_shorten(level);
+    return unclog_levels[l].shortname;
 }
 
 const char* unclog_level_tostr(int level) {
-    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
-        if (UNCLOG_LEVEL_COMPARE(level, l->level)) {
-            return l->name;
-        }
-    }
-    return "Minimum";
+    int l = unclog_level_shorten(level);
+    return unclog_levels[l].name;
 }
 
 uint32_t unclog_details_todetail(const char* value) {
