@@ -71,7 +71,8 @@ static void unclog_sink_stderr_init(unclog_sink_t* s) {
 }
 
 static void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
-    char buffer[PATH_MAX] = {0};
+    char buffer[PATH_MAX];
+    *buffer = '\0';
     unclog_sink_default(buffer, data, list);
     fprintf(stderr, buffer);
 
