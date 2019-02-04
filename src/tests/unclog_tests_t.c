@@ -16,29 +16,32 @@ typedef struct test_thread_param_s {
     pthread_t thread;
     int threadid;
     uint32_t waiting_flags;
+    uint64_t messages;
 } test_thread_param_t;
 
-test_thread_param_t default_params = {0, 0, 0};
-static int THREAD_COUNT = 1;
+test_thread_param_t default_params = {0, 0, 0, 0};
+static int THREAD_COUNT = 10;
 
 static void* test_thread(void* data) {
-    test_thread_param_t* param = data;
+    test_thread_param_t* p = data;
 
     unclog_t* l = unclog_open("thread");
 
-    for (int i = 0; param->threadid > 0; i++) {
+    for (int i = 0; p->threadid > 0; i++) {
         int level = 1 + i%7;
 
         struct timespec wait = {1, 0};
-        if (param->waiting_flags & WAITFLAG_RANDOM) {
+        if (p->waiting_flags & WAITFLAG_RANDOM) {
             wait.tv_sec = 0;
             wait.tv_nsec = random() * 100000000.0 / RAND_MAX;
         }
         unclog_log(
             (unclog_data_t){.ha = l, .le = level, .fi = __FILE__, .fu = __func__, .li = __LINE__},
-            "thread %3d, test level %4d, sleep: %ld.%09ld", param->threadid, level, wait.tv_sec,
+            "thread %3d, test level %4d, sleep: %ld.%09ld", p->threadid, level, wait.tv_sec,
             wait.tv_nsec);
-        if (param->waiting_flags & WAITFLAG_WAIT) nanosleep(&wait, NULL);
+        p->messages++;
+
+        if (p->waiting_flags & WAITFLAG_WAIT) nanosleep(&wait, NULL);
     }
 
     unclog_close(l);
@@ -87,6 +90,7 @@ void* sleepthread(void* data) {
     for (int i = 0; i < THREAD_COUNT; i++) {
         test_thread_param_t* p = &params[i];
         pthread_join(p->thread, NULL);
+        fprintf(stderr, "thread id %d: %llu messages\n", i+1, p->messages);
     }
 
     unclog_close(logger);

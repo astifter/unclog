@@ -2,3 +2,4 @@
 /*.trs
 /.gdb_history
 /unclog_tests_*
+/gmon.out
