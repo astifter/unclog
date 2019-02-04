@@ -23,28 +23,17 @@ test_thread_param_t default_params = {0, 0, 0, 0};
 static int THREAD_COUNT = 10;
 
 static void* test_thread(void* data) {
-    test_thread_param_t* param = data;
+    test_thread_param_t* p = data;
 
     unclog_t* l = unclog_open("thread");
 
-    for (int i = 0; param->threadid > 0; i++) {
-        //int level = random() * 1600.0 / RAND_MAX;
-
-        //struct timespec wait = {1, 0};
-        //if (param->waiting_flags & WAITFLAG_RANDOM) {
-        //    wait.tv_sec = 0;
-        //    wait.tv_nsec = random() * 100000000.0 / RAND_MAX;
-        //}
-        //unclog_log(
-        //    (unclog_data_t){.ha = l, .le = level, .fi = __FILE__, .fu = __func__, .li = __LINE__},
-        //    "thread %3d, test level %4d, sleep: %ld.%09ld", param->threadid, level, wait.tv_sec, wait.tv_nsec);
-        //if (param->waiting_flags & WAITFLAG_WAIT) nanosleep(&wait, NULL);
-
-        int level = 100 + ( (i%7) * 200 );
+    for (int i = 0; p->threadid > 0; i++) {
+        int level = UNCLOG_LEVEL_TRACE; //1 + i % 7;
         unclog_log(
             (unclog_data_t){.ha = l, .le = level, .fi = __FILE__, .fu = __func__, .li = __LINE__},
-            "thread %3d, test level %4d", param->threadid, level);
-        param->nummessages++;
+            "thread %3d, test level %4d", p->threadid, level);
+        p->nummessages++;
+        fprintf(stderr, "unclog source\n");
     }
 
     unclog_close(l);
@@ -63,22 +52,23 @@ void struct_timespec_add_ms(struct timespec* n, unsigned long time_ms) {
 }
 
 void* sleepthread(void* data) {
-    //unclog_t* logger = unclog_open("sleep");
+    unclog_t* logger = unclog_open("sleep");
 
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
-    for (int i = 0; i < 1; i++) {
-        // int level = ((i % 8) * 200) + 200;
-        // char buffer[4096] = {0};
-        // sprintf(buffer, "[Defaults]\nLevel=%s\nSinks=stderr\n[thread]\nLevel=Minimum",
-        // unclog_level_tostr(level));
+    for (int i = 0; i < 30; i++) {
+        int level = UNCLOG_LEVEL_TRACE; //1 + i % 7;
 
-        ////unclog_global_dump_config(unclog_global);
-        // UL_FA(logger, "configuring to %d\n%s", level, buffer);
-        // unclog_reinit(buffer);
-        ////unclog_global_dump_config(unclog_global);
+        char buffer[4096] = "";
+        sprintf(buffer, "[Defaults]\nLevel=%s\nSinks=stderr\n[thread]\nLevel=Trace",
+                unclog_level_tostr(level));
 
-        struct_timespec_add_ms(&now, 30000);
+        //unclog_global_dump_config(unclog_global);
+        UL_FA(logger, "configuring to %d\n%s", level, buffer);
+        unclog_reinit(buffer);
+        //unclog_global_dump_config(unclog_global);
+
+        struct_timespec_add_ms(&now, 1000);
         clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &now, NULL);
     }
 
@@ -90,10 +80,10 @@ void* sleepthread(void* data) {
     for (int i = 0; i < THREAD_COUNT; i++) {
         test_thread_param_t* p = &params[i];
         pthread_join(p->thread, NULL);
-        fprintf(stderr, "thread %d: %lld\n", i+1, p->nummessages);
+        fprintf(stderr, "thread %d: %llu\n", i + 1, p->nummessages);
     }
 
-    //unclog_close(logger);
+    unclog_close(logger);
     return NULL;
 }
 
@@ -114,7 +104,8 @@ int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
-    unclog_init("[Defaults]\nLevel=Minimum\nSinks=stderr\n[thread]\nLevel=Minimum");
+    unclog_init("[Defaults]\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
+    //unclog_global_dump_config(unclog_global);
 
     if (argc >= 2) THREAD_COUNT = atoi(argv[1]);
 
@@ -142,7 +133,9 @@ int main(int argc, char** argv) {
     fprintf(stderr, "start %ld.%09ld seconds\n", start.tv_sec, start.tv_nsec);
     fprintf(stderr, "stop %ld.%09ld seconds\n", stop.tv_sec, stop.tv_nsec);
 
+    unclog_global_dump_config(unclog_global);
     uint64_t sum = unclog_sink_stderr_get_num_messages();
+    fprintf(stderr, "%llu\n", sum); 
 
     double msg_sec = sum / (diff.tv_sec + (diff.tv_nsec / 1000000000.0));
     char* postfix = "";
