@@ -11,15 +11,13 @@
 extern "C" {
 #endif
 
-#define UNCLOG_LEVEL_MAXIMUM 0
-#define UNCLOG_LEVEL_FATAL 200
-#define UNCLOG_LEVEL_CRITICAL 400
-#define UNCLOG_LEVEL_ERROR 600
-#define UNCLOG_LEVEL_WARNING 800
-#define UNCLOG_LEVEL_INFO 1000
-#define UNCLOG_LEVEL_DEBUG 1200
-#define UNCLOG_LEVEL_TRACE 1400
-#define UNCLOG_LEVEL_MINIMUM INT_MAX
+#define UNCLOG_LEVEL_FATAL 1
+#define UNCLOG_LEVEL_CRITICAL 2
+#define UNCLOG_LEVEL_ERROR 3
+#define UNCLOG_LEVEL_WARNING 4
+#define UNCLOG_LEVEL_INFO 5
+#define UNCLOG_LEVEL_DEBUG 6
+#define UNCLOG_LEVEL_TRACE 7
 #define UNCLOG_LEVEL_COMPARE(l, m) ((l) <= (m))
 
 typedef struct unclog_s { int level; } unclog_t;
@@ -40,7 +38,7 @@ void unclog_log(unclog_data_t data, ...);
 void unclog_close(unclog_t* handle);
 
 #ifndef UNCLOG_LEVEL_CUTOFF
-#define UNCLOG_LEVEL_CUTOFF UNCLOG_LEVEL_MINIMUM
+#define UNCLOG_LEVEL_CUTOFF UNCLOG_LEVEL_TRACE
 #endif
 
 #define UNCLOG(h, l, ...)                                                                  \

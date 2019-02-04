@@ -318,7 +318,7 @@ static void logging_complex_setup(int level_source, int level_sink) {
 static void logging_complex_loop1(void) {
     fprintf(stderr, "\n");
     for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
-        logging_complex_setup(l->level, UNCLOG_LEVEL_MINIMUM);
+        logging_complex_setup(l->level, UNCLOG_LEVEL_TRACE);
 
         for (unclog_levels_t* s = unclog_levels; s->name != NULL; s++) {
             UNCLOG(logging_complex_logger, s->level, "herbert");
@@ -337,7 +337,7 @@ static void logging_complex_loop1(void) {
 static void logging_complex_loop2(void) {
     fprintf(stderr, "\n");
     for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
-        logging_complex_setup(l->level, UNCLOG_LEVEL_MINIMUM);
+        logging_complex_setup(l->level, UNCLOG_LEVEL_TRACE);
 
         for (unclog_levels_t* s = unclog_levels; s->name != NULL; s++) {
             UNCLOG(logging_complex_logger, s->level, "herbert");

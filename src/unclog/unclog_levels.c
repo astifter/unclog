@@ -9,7 +9,6 @@ unclog_levels_t unclog_levels[] = {
     {UNCLOG_LEVEL_INFO, "Info", 'I'},
     {UNCLOG_LEVEL_DEBUG, "Debug", 'D'},
     {UNCLOG_LEVEL_TRACE, "Trace", 'T'},
-    {UNCLOG_LEVEL_MINIMUM, "Minimum", 'M'},
     {-1, NULL, '\0'},
 };
 
@@ -39,7 +38,7 @@ char unclog_level_tochar(int level) {
             return l->shortname;
         }
     }
-    return 'M';
+    return 'T';
 }
 
 const char* unclog_level_tostr(int level) {
@@ -48,7 +47,7 @@ const char* unclog_level_tostr(int level) {
             return l->name;
         }
     }
-    return "Minimum";
+    return "Trace";
 }
 
 uint32_t unclog_details_todetail(const char* value) {
