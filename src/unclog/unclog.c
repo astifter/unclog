@@ -8,7 +8,7 @@ const unclog_values_t unclog_defaults = {
 };
 const char* unclog_defaults_file = "unclog.log";
 
-static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_INITIALIZER;
+static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP;
 unclog_global_t* unclog_global = NULL;
 
 static void unclog_init_nolock(const char* config, int usefile, int initialized) {
