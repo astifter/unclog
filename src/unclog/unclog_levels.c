@@ -19,6 +19,7 @@ unclog_details_t unclog_details[] = {
     {UNCLOG_OPT_FILE, "File"},
     {UNCLOG_OPT_LINE, "Line"},
     {UNCLOG_OPT_MESSAGE, "Message"},
+    {UNCLOG_OPT_MAXIMUM, "Full"},
     {-1, NULL},
 };
 // clang-format on
@@ -67,6 +68,7 @@ char* unclog_details_tostr(uint32_t details) {
     int next = 0;
     unclog_details_t* d = unclog_details;
     for (; d->name != NULL; d++) {
+        if (d->detail == UNCLOG_OPT_MAXIMUM) continue;
         if (!(d->detail & details)) continue;
 
         if (next != 0) buffer += sprintf(buffer, ",");

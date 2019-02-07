@@ -71,7 +71,7 @@ void* sleepthread(void* data) {
         //sprintf(buffer, "[Defaults]\nLevel=%s\nSinks=stderr\n[thread]\nLevel=Trace",
         //        unclog_level_tostr(level));
         *buffer = '\0';
-        sprintf(buffer, "[Defaults]\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
+        sprintf(buffer, "[Defaults]\nDetails=Full\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
 
         // unclog_global_dump_config(unclog_global);
         UL_FA(logger, "re-configuring logger:\n%s", buffer);
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
-    unclog_init("[Defaults]\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
+    unclog_init("[Defaults]\nDetails=Full\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
 
     if (argc >= 2) THREAD_COUNT = atoi(argv[1]);
 
