@@ -33,23 +33,9 @@ int unclog_level_tolevel(const char* value) {
     return unclog_defaults.level;
 }
 
-char unclog_level_tochar(int level) {
-    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
-        if (UNCLOG_LEVEL_COMPARE(level, l->level)) {
-            return l->shortname;
-        }
-    }
-    return 'T';
-}
+inline char unclog_level_tochar(int level) { return unclog_levels[level - 1].shortname; }
 
-const char* unclog_level_tostr(int level) {
-    for (unclog_levels_t* l = unclog_levels; l->name != NULL; l++) {
-        if (UNCLOG_LEVEL_COMPARE(level, l->level)) {
-            return l->name;
-        }
-    }
-    return "Trace";
-}
+const char* unclog_level_tostr(int level) { return unclog_levels[level - 1].name; }
 
 uint32_t unclog_details_todetail(const char* value) {
     for (unclog_details_t* d = unclog_details; d->name != NULL; d++) {

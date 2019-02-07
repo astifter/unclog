@@ -28,7 +28,7 @@ static void* test_thread(void* data) {
     unclog_t* l = unclog_open("thread");
 
     for (int i = 0; p->threadid > 0; i++) {
-        int level = 1 + i%7;
+        int level = 1 + i % 7;
 
         struct timespec wait = {1, 0};
         if (p->waiting_flags & WAITFLAG_RANDOM) {
@@ -66,12 +66,13 @@ void* sleepthread(void* data) {
     clock_gettime(CLOCK_MONOTONIC, &now);
     char buffer[4096] = "";
     for (int i = 0; i < 30; i++) {
-        //int level = 1 + i % 7;
-        //char buffer[4096] = "";
-        //sprintf(buffer, "[Defaults]\nLevel=%s\nSinks=stderr\n[thread]\nLevel=Trace",
+        // int level = 1 + i % 7;
+        // char buffer[4096] = "";
+        // sprintf(buffer, "[Defaults]\nLevel=%s\nSinks=stderr\n[thread]\nLevel=Trace",
         //        unclog_level_tostr(level));
         *buffer = '\0';
-        sprintf(buffer, "[Defaults]\nDetails=Full\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
+        sprintf(buffer,
+                "[Defaults]\nDetails=Full\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
 
         // unclog_global_dump_config(unclog_global);
         UL_FA(logger, "re-configuring logger:\n%s", buffer);
@@ -90,7 +91,7 @@ void* sleepthread(void* data) {
     for (int i = 0; i < THREAD_COUNT; i++) {
         test_thread_param_t* p = &params[i];
         pthread_join(p->thread, NULL);
-        fprintf(stderr, "thread id %d: %llu messages\n", i+1, p->messages);
+        fprintf(stderr, "thread id %d: %llu messages\n", i + 1, p->messages);
     }
 
     unclog_close(logger);

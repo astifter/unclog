@@ -2,27 +2,34 @@
 
 #include "unclog_int.h"
 
-size_t stringappend(char* dest, const char* src) {
+//#define NOIL __attribute__((noinline))
+#define NOIL inline
+
+static NOIL size_t stringappend(char* dest, const char* src) {
     size_t size = strlen(src);
     memcpy(dest, src, size + 1);
     return size;
 }
 
-static size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_list list) {
+static NOIL size_t unclog_sink_strfime(char* buffer, unclog_data_t* data) {
+    struct tm time;
+    gmtime_r(&data->no.tv_sec, &time);
+
+    char timebuffer[64];
+    int size = strftime(timebuffer, 64, "%Y-%m-%d %H:%M:%S", &time);
+
+    memcpy(buffer, timebuffer, size);
+    return size;
+}
+
+static NOIL size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_list list) {
     char* bufferpos = buffer;
 
     uint32_t details = data->si->settings.details;
     uint32_t needsspace = 0;
 
     if (details & UNCLOG_OPT_TIMESTAMP) {
-        struct tm time;
-        gmtime_r(&data->no.tv_sec, &time);
-
-        char timebuffer[64];
-        int size = strftime(timebuffer, 64, "%Y-%m-%d %H:%M:%S", &time);
-
-        memcpy(buffer, timebuffer, size);
-        bufferpos += size;
+        bufferpos += unclog_sink_strfime(buffer, data);
         needsspace = 1;
     }
     if (details & UNCLOG_OPT_LEVEL) {
@@ -57,28 +64,29 @@ static size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_list lis
         bufferpos += vsprintf(bufferpos, fmt, list);
         needsspace = 1;
     }
-    *bufferpos = '\n';
-    bufferpos++;
+    *bufferpos++ = '\n';
 
     return bufferpos - buffer;
 }
+
+static NOIL void unclog_sink_fprintf(const char* buffer) { fprintf(stderr, buffer); }
 
 static uint64_t unclog_sink_stderr_messages = 0;
 static pthread_mutex_t unclog_sink_stderr_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
-    char buffer[PATH_MAX] = {0};
+    char buffer[PATH_MAX];
+    *buffer = '\0';
+
     unclog_sink_default(buffer, data, list);
-    fprintf(stderr, buffer);
+    unclog_sink_fprintf(buffer);
 
     pthread_mutex_lock(&unclog_sink_stderr_mutex);
     unclog_sink_stderr_messages++;
     pthread_mutex_unlock(&unclog_sink_stderr_mutex);
 }
 
-uint64_t unclog_sink_stderr_get_num_messages() {
-    return unclog_sink_stderr_messages;
-}
+uint64_t unclog_sink_stderr_get_num_messages() { return unclog_sink_stderr_messages; }
 
 typedef struct unclog_sink_file_data_s { FILE* file; } unclog_sink_file_data_t;
 
@@ -93,8 +101,10 @@ static void unclog_sink_file_init(unclog_sink_t* s) {
 }
 
 static void unclog_sink_file_log(unclog_data_t* data, va_list list) {
+    char buffer[PATH_MAX];
+    *buffer = '\0';
+
     unclog_sink_file_data_t* d = data->si->data;
-    char buffer[PATH_MAX] = {0};
     size_t size = unclog_sink_default(buffer, data, list);
     fwrite(buffer, size, 1, d->file);
 }
