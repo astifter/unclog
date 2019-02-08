@@ -103,7 +103,7 @@ void unclog_log(unclog_data_t data, ...) {
 
     if (!UNCLOG_LEVEL_COMPARE(data.le, data.ha->level)) return;
 
-    clock_gettime(CLOCK_REALTIME, &data.no);
+    clock_gettime(CLOCK_REALTIME, &data.now);
 
     pthread_rwlock_rdlock(&unclog_mutex);
     unclog_sink_t* sink = unclog_global->sinks;
@@ -113,7 +113,7 @@ void unclog_log(unclog_data_t data, ...) {
 
         va_list al;
         va_start(al, data);
-        data.si = sink;
+        data.sink = sink;
         sink->i->methods.log(&data, al);
         va_end(al);
     }

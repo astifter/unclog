@@ -16,7 +16,7 @@ gprof: unclog_tests_t
 	rm -rf gmon.out
 	gcc -std=c99 -pg -O3 -I../unclog -o $< ./unclog_tests_t.c \
 	    ../unclog/.libs/unclog*.o ../inih/ini.o -lpthread
-	./$< 2>&1 | tail -n 30
+	./$< 2>/dev/null
 	gprof ./$< gmon.out | less
 
 valgrind: unclog_tests_1

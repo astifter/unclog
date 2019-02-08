@@ -13,7 +13,7 @@ static NOIL size_t stringappend(char* dest, const char* src) {
 
 static NOIL size_t unclog_sink_strfime(char* buffer, unclog_data_t* data) {
     struct tm time;
-    gmtime_r(&data->no.tv_sec, &time);
+    gmtime_r(&data->now.tv_sec, &time);
 
     char timebuffer[64];
     int size = strftime(timebuffer, 64, "%Y-%m-%d %H:%M:%S", &time);
@@ -25,7 +25,7 @@ static NOIL size_t unclog_sink_strfime(char* buffer, unclog_data_t* data) {
 static NOIL size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_list list) {
     char* bufferpos = buffer;
 
-    uint32_t details = data->si->settings.details;
+    uint32_t details = data->sink->settings.details;
     uint32_t needsspace = 0;
 
     if (details & UNCLOG_OPT_TIMESTAMP) {
@@ -104,7 +104,7 @@ static void unclog_sink_file_log(unclog_data_t* data, va_list list) {
     char buffer[PATH_MAX];
     *buffer = '\0';
 
-    unclog_sink_file_data_t* d = data->si->data;
+    unclog_sink_file_data_t* d = data->sink->data;
     size_t size = unclog_sink_default(buffer, data, list);
     fwrite(buffer, size, 1, d->file);
 }

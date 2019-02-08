@@ -67,9 +67,6 @@ void* sleepthread(void* data) {
     char buffer[4096] = "";
     for (int i = 0; i < 30; i++) {
         // int level = 1 + i % 7;
-        // char buffer[4096] = "";
-        // sprintf(buffer, "[Defaults]\nLevel=%s\nSinks=stderr\n[thread]\nLevel=Trace",
-        //        unclog_level_tostr(level));
         *buffer = '\0';
         sprintf(buffer,
                 "[Defaults]\nDetails=Full\nLevel=Trace\nSinks=stderr\n[thread]\nLevel=Trace");
@@ -156,7 +153,7 @@ int main(int argc, char** argv) {
         postfix = "M";
     }
 
-    fprintf(stderr, "%llu messages took %ld.%09ld seconds: %.3lf%s msgs/sec\n", sum, diff.tv_sec,
+    fprintf(stdout, "%llu messages took %ld.%09ld seconds: %.3lf%s msgs/sec\n", sum, diff.tv_sec,
             diff.tv_nsec, msg_sec, postfix);
 
     fprintf(stderr, "----------------------------------------------------------------------\n");

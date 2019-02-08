@@ -29,8 +29,9 @@ typedef struct unclog_data_s {
     const char* fu;
     unsigned int li;
 
-    struct timespec no;
-    struct unclog_sink_s* si;
+    struct timespec now;
+
+    struct unclog_sink_s* sink;
 } unclog_data_t;
 
 unclog_t* unclog_open(const char* source);
