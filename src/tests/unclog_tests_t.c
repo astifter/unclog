@@ -28,7 +28,7 @@ static void* test_thread(void* data) {
     unclog_t* l = unclog_open("thread");
 
     for (int i = 0; p->threadid > 0; i++) {
-        int level = 1 + i % 7;
+        int level = UNCLOG_LEVEL_TRACE; // = 1 + i % 7;
 
         struct timespec wait = {1, 0};
         if (p->waiting_flags & WAITFLAG_RANDOM) {
