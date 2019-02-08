@@ -72,6 +72,7 @@ void unclog_global_configure(unclog_global_t* global, const char* config, int us
 unclog_global_t* unclog_global_create(const char* config, int usefile, int initialized) {
     unclog_global_t* g = malloc(sizeof(unclog_global_t));
     memset(g, 0, sizeof(unclog_global_t));
+    pthread_mutex_init(&g->now_mutex, NULL);
 
     unclog_global_configure(g, config, usefile, initialized);
     return g;
@@ -108,6 +109,7 @@ void unclog_global_destroy(unclog_global_t* global) {
         unclog_source_destroy(d);
     }
 
+    pthread_mutex_destroy(&global->now_mutex);
     free(global);
 }
 

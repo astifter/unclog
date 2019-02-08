@@ -13,6 +13,7 @@ gdb: unclog_tests_1
 	LD_LIBRARY_PATH=../unclog/.libs gdb ./.libs/unclog_tests_1
 
 gprof: unclog_tests_t
+	make -C ../.. check
 	rm -rf gmon.out
 	gcc -std=c99 -pg -O3 -I../unclog -o $< ./unclog_tests_t.c \
 	    ../unclog/.libs/unclog*.o ../inih/ini.o -lpthread

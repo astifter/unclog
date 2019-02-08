@@ -103,7 +103,24 @@ void unclog_log(unclog_data_t data, ...) {
 
     if (!UNCLOG_LEVEL_COMPARE(data.le, data.ha->level)) return;
 
-    clock_gettime(CLOCK_REALTIME, &data.now);
+    // Printing the time is somewhat expensive, make sure its done only when
+    // necessary.
+    struct timespec now;
+    clock_gettime(CLOCK_REALTIME, &now);
+    if (now.tv_sec > unclog_global->now.tv_sec) {
+        pthread_mutex_lock(&unclog_global->now_mutex);
+        if (now.tv_sec > unclog_global->now.tv_sec) {
+            unclog_global->now = now;
+
+            struct tm time;
+            gmtime_r(&unclog_global->now.tv_sec, &time);
+            unclog_global->now_buffer_size =
+                strftime(unclog_global->now_buffer, 64, "%Y-%m-%d %H:%M:%S", &time);
+        }
+        pthread_mutex_unlock(&unclog_global->now_mutex);
+    }
+    data.now_buffer = unclog_global->now_buffer;
+    data.now_buffer_size = &unclog_global->now_buffer_size;
 
     pthread_rwlock_rdlock(&unclog_mutex);
     unclog_sink_t* sink = unclog_global->sinks;

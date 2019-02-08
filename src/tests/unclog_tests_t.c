@@ -28,7 +28,7 @@ static void* test_thread(void* data) {
     unclog_t* l = unclog_open("thread");
 
     for (int i = 0; p->threadid > 0; i++) {
-        int level = UNCLOG_LEVEL_TRACE; // = 1 + i % 7;
+        int level = UNCLOG_LEVEL_TRACE;  // = 1 + i % 7;
 
         struct timespec wait = {1, 0};
         if (p->waiting_flags & WAITFLAG_RANDOM) {
@@ -85,11 +85,14 @@ void* sleepthread(void* data) {
         test_thread_param_t* p = &params[i];
         p->threadid = 0;
     }
+    uint64_t sum = 0;
     for (int i = 0; i < THREAD_COUNT; i++) {
         test_thread_param_t* p = &params[i];
         pthread_join(p->thread, NULL);
         fprintf(stderr, "thread id %d: %llu messages\n", i + 1, p->messages);
+        sum += p->messages;
     }
+    fprintf(stdout, "%d threads sent a total of %llu messages\n", THREAD_COUNT, sum);
 
     unclog_close(logger);
     return NULL;
