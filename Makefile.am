@@ -1,4 +1,5 @@
 ACLOCAL_AMFLAGS = -Im4
+AM_CFLAGS = -O2
 
 SUBDIRS = src
 EXTRA_DIST = autogen.sh unclog.doxygen README.md
