@@ -1,159 +1,131 @@
-#define _GNU_SOURCE
+#include <unclog/unclog_adv.h>
 
-#include "unclog_int.h"
+#include <pthread.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/queue.h>
 
-const unclog_values_t unclog_defaults = {
-    .level = UNCLOG_LEVEL_WARNING,
-    .details = (UNCLOG_OPT_TIMESTAMP | UNCLOG_OPT_LEVEL | UNCLOG_OPT_SOURCE | UNCLOG_OPT_MESSAGE),
-};
-const char* unclog_defaults_file = "unclog.log";
+static void* malloc_and_clear(size_t size) {
+    void* rv = malloc(size);
+    memset(rv, 0, size);
+    return rv;
+}
+
+typedef struct unclog_source_config_s {
+    unclog_values_t settings;
+    char* name;
+    int name_size;
+
+    LIST_ENTRY(unclog_source_config_s) entries;
+} unclog_source_config_t;
+
+typedef struct unclog_source_s {
+    int level;
+    char* name;
+
+    LIST_ENTRY(unclog_source_s) entries;
+} unclog_source_t;
+
+typedef struct unclog_global_s {
+    LIST_HEAD(unclog_source_config_list, unclog_source_config_s) configs;
+    LIST_HEAD(unclog_source_list, unclog_source_s) sources;
+} unclog_global_t;
 
 static pthread_rwlock_t unclog_mutex = PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP;
-unclog_global_t* unclog_global = NULL;
+static unclog_global_t* unclog_global = NULL;
 
-static void unclog_init_nolock(const char* config, int usefile, int initialized) {
-    if (unclog_global == NULL) {
-        unclog_global = unclog_global_create(config, usefile, initialized);
-    }
-}
+static unclog_source_config_t* _unclog_source_config_get(const char* source) {
+    int final_size = -1;
+    unclog_source_config_t* final = NULL;
 
-static void unclog_deinit_nolock(void) {
-    if (unclog_global != NULL) {
-        unclog_global_destroy(unclog_global);
-        unclog_global = NULL;
-    }
-}
-
-void unclog_init(const char* config) {
-    pthread_rwlock_wrlock(&unclog_mutex);
-
-    unclog_deinit_nolock();
-    unclog_init_nolock(config, 0, 1);
-
-    pthread_rwlock_unlock(&unclog_mutex);
-
-    // unclog_global_dump_config(unclog_global);
-}
-
-void unclog_deinit(void) {
-    pthread_rwlock_wrlock(&unclog_mutex);
-
-    unclog_deinit_nolock();
-
-    pthread_rwlock_unlock(&unclog_mutex);
-}
-
-void unclog_reinit(const char* config) {
-    pthread_rwlock_wrlock(&unclog_mutex);
-
-    // unclog_global_dump_config(unclog_global);
-    unclog_global_sink_clear(unclog_global, 0);
-    unclog_global_configure(unclog_global, config, 0, 1);
-    // unclog_global_dump_config(unclog_global);
-
-    pthread_rwlock_unlock(&unclog_mutex);
-}
-
-void unclog_sink_register(const char* name, unclog_values_t* settings,
-                          unclog_sink_methods_t methods) {
-    pthread_rwlock_wrlock(&unclog_mutex);
-
-    unclog_sink_t* sink = unclog_global_sink_get(unclog_global, name);
-    if (sink == NULL) {
-        sink = unclog_sink_create(settings, name);
-        unclog_global_sink_add(unclog_global, sink);
+    unclog_source_config_t* c = unclog_global->configs.lh_first;
+    while (c != NULL) {
+        if (c->name_size > final_size) {
+            if (strncmp(source, c->name, c->name_size) == 0) {
+                final_size = c->name_size;
+                final = c;
+            }
+        }
+        c = c->entries.le_next;
     }
 
-    if (settings != NULL) {
-        memcpy(&sink->settings, settings, sizeof(unclog_values_t));
-        if (settings->level == 0) sink->settings.level = unclog_global->defaults.level;
-        if (settings->details == 0) sink->settings.details = unclog_global->defaults.details;
+    return final;
+}
+
+static unclog_source_t* unclog_source_create_or_get(const char* source) {
+    pthread_rwlock_wrlock(&unclog_mutex);
+    unclog_source_t* s = unclog_global->sources.lh_first;
+    while (s != NULL) {
+        if (strcmp(s->name, source) == 0) break;
+        s = s->entries.le_next;
     }
+    if (s == NULL) {
+        unclog_source_config_t* config = _unclog_source_config_get(source);
 
-    sink->i->methods = methods;
-    sink->i->registered = 1;
+        s = malloc_and_clear(sizeof(unclog_source_t));
+        s->name = strdup(source);
+        s->level = config->settings.level;
 
-    if (sink->i->methods.init != NULL) sink->i->methods.init(sink);
-
+        LIST_INSERT_HEAD(&unclog_global->sources, s, entries);
+    }
     pthread_rwlock_unlock(&unclog_mutex);
-
-    // unclog_global_dump_config(unclog_global);
+    return s;
 }
 
 unclog_t* unclog_open(const char* source) {
-    pthread_rwlock_wrlock(&unclog_mutex);
+    if (unclog_global == NULL) {
+        pthread_rwlock_wrlock(&unclog_mutex);
+        if (unclog_global == NULL) {
+            unclog_global = malloc_and_clear(sizeof(unclog_global_t));
+            LIST_INIT(&unclog_global->configs);
+            LIST_INIT(&unclog_global->sources);
 
-    unclog_init_nolock(NULL, 1, 0);
+            unclog_source_config_t* c = malloc_and_clear(sizeof(unclog_source_config_t));
+            c->settings.level = UNCLOG_LEVEL_DEFAULT;
+            c->settings.details = UNCLOG_DETAILS_DEFAULT;
+            c->name = strdup("");
+            c->name_size = strlen(c->name);
 
-    unclog_source_t* handle = unclog_global_source_get(unclog_global, source);
-    if (handle == NULL) {
-        handle = unclog_source_create(unclog_global->defaults.level, source);
-        unclog_global_source_add(unclog_global, handle);
+            LIST_INSERT_HEAD(&unclog_global->configs, c, entries);
+        }
+        pthread_rwlock_unlock(&unclog_mutex);
     }
-    handle->active++;
 
-    pthread_rwlock_unlock(&unclog_mutex);
-
-    // unclog_global_dump_config(unclog_global);
-    return (unclog_t*)handle;
+    unclog_source_t* h = unclog_source_create_or_get(source);
+    return (unclog_t*)h;
 }
 
 void unclog_log(unclog_data_t data, ...) {
-    if (data.ha == NULL) return;
-
-    if (!UNCLOG_LEVEL_COMPARE(data.le, data.ha->level)) return;
-
-    // Printing the time is somewhat expensive, make sure its done only when
-    // necessary.
-    struct timespec now;
-    clock_gettime(CLOCK_REALTIME, &now);
-    if (now.tv_sec > unclog_global->now.tv_sec) {
-        pthread_mutex_lock(&unclog_global->now_mutex);
-        if (now.tv_sec > unclog_global->now.tv_sec) {
-            unclog_global->now = now;
-
-            struct tm time;
-            gmtime_r(&unclog_global->now.tv_sec, &time);
-            unclog_global->now_buffer_size =
-                strftime(unclog_global->now_buffer, 64, "%Y-%m-%d %H:%M:%S", &time);
-        }
-        pthread_mutex_unlock(&unclog_global->now_mutex);
-    }
-    data.now_buffer = unclog_global->now_buffer;
-    data.now_buffer_size = &unclog_global->now_buffer_size;
-
     pthread_rwlock_rdlock(&unclog_mutex);
-    unclog_sink_t* sink = unclog_global->sinks;
-    for (; sink != NULL; sink = sink->i->next) {
-        if (sink->i->methods.log == NULL) continue;
-        if (!UNCLOG_LEVEL_COMPARE(data.le, sink->settings.level)) continue;
-
-        va_list al;
-        va_start(al, data);
-        data.sink = sink;
-        sink->i->methods.log(&data, al);
-        va_end(al);
-    }
+    va_list list;
+    va_start(list, data);
+    const char* fmt = va_arg(list, const char*);
+    vfprintf(stderr, fmt, list);
+    fprintf(stderr, "\n");
+    va_end(list);
     pthread_rwlock_unlock(&unclog_mutex);
 }
 
-void unclog_close(unclog_t* public_handle) {
-    if (public_handle == NULL) return;
-    unclog_source_t* handle = (unclog_source_t*)public_handle;
-
+void unclog_close(unclog_t* handle) {
+    unclog_source_t* source = handle;
     pthread_rwlock_wrlock(&unclog_mutex);
+    LIST_REMOVE(source, entries);
+    free(source->name);
+    free(source);
 
-    handle->active--;
-    int has_active_handles;
-    if (handle->active == 0 && handle->initialized == 0) {
-        has_active_handles = unclog_global_source_remove(unclog_global, handle);
-    } else {
-        has_active_handles = 1;
+    if (unclog_global->sources.lh_first == NULL) {
+        unclog_source_config_t* c = unclog_global->configs.lh_first;
+        while (c != NULL) {
+            unclog_source_config_t* d = c;
+            c = c->entries.le_next;
+
+            free(d->name);
+            free(d);
+        }
+        free(unclog_global);
+        unclog_global = NULL;
     }
-
-    if (!has_active_handles && unclog_global->initialized != 1) {
-        unclog_deinit_nolock();
-    }
-
     pthread_rwlock_unlock(&unclog_mutex);
 }

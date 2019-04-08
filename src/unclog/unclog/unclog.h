@@ -3,8 +3,8 @@
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 199309L
 #endif
+#define _GNU_SOURCE
 
-#include <limits.h>
 #include <time.h>
 
 #ifdef __cplusplus
@@ -20,6 +20,16 @@ extern "C" {
 #define UNCLOG_LEVEL_TRACE 7
 #define UNCLOG_LEVEL_COMPARE(l, m) ((l) <= (m))
 
+#ifndef UNCLOG_LEVEL_DEFAULT
+#define UNCLOG_LEVEL_DEFAULT UNCLOG_LEVEL_WARNING
+#endif
+
+#ifndef UNCLOG_DETAILS_DEFAULT
+#define UNCLOG_DETAILS_DEFAULT                                                 \
+    (UNCLOG_DETAILS_TIMESTAMP | UNCLOG_DETAILS_LEVEL | UNCLOG_DETAILS_SOURCE | \
+     UNCLOG_DETAILS_MESSAGE)
+#endif
+
 typedef struct unclog_s { int level; } unclog_t;
 
 typedef struct unclog_data_s {
@@ -29,10 +39,7 @@ typedef struct unclog_data_s {
     const char* fu;
     unsigned int li;
 
-    char* now_buffer;
-    size_t* now_buffer_size;
-
-    struct unclog_sink_s* sink;
+    struct tm ti;
 } unclog_data_t;
 
 unclog_t* unclog_open(const char* source);

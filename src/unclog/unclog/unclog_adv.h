@@ -9,13 +9,13 @@ void unclog_init(const char* config);
 void unclog_reinit(const char* config);
 void unclog_deinit(void);
 
-#define UNCLOG_OPT_TIMESTAMP 0x01
-#define UNCLOG_OPT_LEVEL 0x02
-#define UNCLOG_OPT_SOURCE 0x04
-#define UNCLOG_OPT_FILE 0x08
-#define UNCLOG_OPT_LINE 0x10
-#define UNCLOG_OPT_MESSAGE 0x20
-#define UNCLOG_OPT_MAXIMUM 0x3F
+#define UNCLOG_DETAILS_TIMESTAMP 0x01
+#define UNCLOG_DETAILS_LEVEL 0x02
+#define UNCLOG_DETAILS_SOURCE 0x04
+#define UNCLOG_DETAILS_FILE 0x08
+#define UNCLOG_DETAILS_LINE 0x10
+#define UNCLOG_DETAILS_MESSAGE 0x20
+#define UNCLOG_DETAILS_MAXIMUM 0x3F
 
 typedef struct unclog_values_s {
     int level;
@@ -31,7 +31,7 @@ typedef struct unclog_keyvalue_s {
 typedef struct unclog_sink_internal_s unclog_sink_internal_t;
 
 typedef struct unclog_sink_s {
-    unclog_values_t settings;
+    unclog_values_t* settings;
     unclog_keyvalue_t* values;
     void* data;
     unclog_sink_internal_t* i;

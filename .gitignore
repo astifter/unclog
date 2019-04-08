@@ -28,3 +28,4 @@ CUnitAutomated-Results.xml
 *.swp
 cscope.*
 /.ide/
+.gdb_history
