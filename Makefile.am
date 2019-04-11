@@ -26,8 +26,8 @@ clean-local:
 	rm -rf ./docs/
 
 format: 
-	SOURCES=$$(find src/unclog src/tests -name '*.c'); \
-	HEADERS=$$(find src/unclog src/tests -name '*.h'); \
+	SOURCES=$$(find src/unclog src/tests src/examples -name '*.c'); \
+	HEADERS=$$(find src/unclog src/tests src/examples -name '*.h'); \
 	clang-format-3.8 -i -style=file $${SOURCES} $${HEADERS}
 
 docs/html/index.html: unclog.doxygen src/unclog/*.c src/unclog/*.h README.md

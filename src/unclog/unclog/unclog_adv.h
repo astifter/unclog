@@ -5,10 +5,13 @@
 #include <stdarg.h>
 #include <stdint.h>
 
-void unclog_init(const char* config);
-void unclog_reinit(const char* config);
+// it is possible to preload unclog with a config for when no config files
+// should be used
+// also unclog can be deinitialized centrally
+void unclog_config(const char* config);
 void unclog_deinit(void);
 
+// the following defines declare which details should be logged
 #define UNCLOG_DETAILS_NONE 0x00
 #define UNCLOG_DETAILS_TIMESTAMP 0x01
 #define UNCLOG_DETAILS_LEVEL 0x02
@@ -18,35 +21,28 @@ void unclog_deinit(void);
 #define UNCLOG_DETAILS_MESSAGE 0x20
 #define UNCLOG_DETAILS_FULL 0x3F
 
-typedef struct unclog_values_s {
-    int level;
-    uint32_t details;
-} unclog_values_t;
-
-typedef struct unclog_keyvalue_s {
-    char* key;
+// have a key-value store for additional configurations for sinks
+typedef struct unclog_config_value_s {
+    char* name;
     char* value;
-    struct unclog_keyvalue_s* next;
-} unclog_keyvalue_t;
+    struct unclog_config_value_s* next;
+} unclog_config_value_t;
 
-typedef struct unclog_sink_internal_s unclog_sink_internal_t;
+// the methods to be implemented by a logging sink
+typedef void (*unclog_sink_init_t)(void** data, uint32_t details, unclog_config_value_t* config);
+typedef void (*unclog_sink_log_t)(unclog_data_t* data, va_list list);
+typedef void (*unclog_sink_deinit_t)(void* data);
 
-typedef struct unclog_sink_s {
-    unclog_values_t* settings;
-    unclog_keyvalue_t* values;
-    void* data;
-    unclog_sink_internal_t* i;
-} unclog_sink_t;
-
-typedef void (*unclog_sink_init_t)(unclog_sink_t* sink);
-typedef void (*unclog_sink_log_t)(unclog_data_t* d, va_list l);
-typedef void (*unclog_sink_deinit_t)(unclog_sink_t* sink);
-
+// a data structure to collect the methods for a custom sink
 typedef struct unclog_sink_methods_s {
     unclog_sink_init_t init;
     unclog_sink_log_t log;
     unclog_sink_deinit_t deinit;
 } unclog_sink_methods_t;
 
-void unclog_sink_register(const char* name, unclog_values_t* settings,
+// register a sink and (optinally) configure level and details. level can be
+// UNCLOG_LEVEL_NONE and details can be UNCLOG_DETAILS_NONE to get the
+// configured values
+// a section with [sink.<name>] can be used to configure the sink in the config
+void unclog_sink_register(const char* name, int level, uint32_t details,
                           unclog_sink_methods_t methods);
