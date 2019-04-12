@@ -80,6 +80,18 @@ int main(int argc, char** argv) {
     UL_DE(logger2, "DEBUG %d, logger2 is %p", 47, logger2);
     UL_TR(logger2, "TRACE %d, logger2 is %p", 48, logger2);
 
+    // reconfigure
+    unclog_config("[defaults]\nLevel=Error");
+
+    // again log to second logger
+    UL_FA(logger2, "FATAL %d, logger2 is %p", 42, logger2);
+    UL_CR(logger2, "CRITICAL %d, logger2 is %p", 43, logger2);
+    UL_ER(logger2, "ERROR %d, logger2 is %p", 44, logger2);
+    UL_WA(logger2, "WARNING %d, logger2 is %p", 45, logger2);
+    UL_IN(logger2, "INFO %d, logger2 is %p", 46, logger2);
+    UL_DE(logger2, "DEBUG %d, logger2 is %p", 47, logger2);
+    UL_TR(logger2, "TRACE %d, logger2 is %p", 48, logger2);
+
     // now close logger2 as well
     unclog_close(logger2);
 

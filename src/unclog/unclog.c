@@ -14,7 +14,7 @@
 #define MATCH(s1, s2) (strcmp(s1, s2) == 0)
 
 // list if locations for unclog.ini files
-const char* unclog_config_locations[] = {
+static const char* unclog_config_locations[] = {
     "./unclog.ini", "/etc/unclog.ini", NULL,
 };
 
@@ -25,7 +25,7 @@ static void* malloc_and_clear(size_t size) {
     return rv;
 }
 
-struct unclog_levels_s {
+static struct unclog_levels_s {
     int level;
     const char* name;
 } unclog_levels[] = {
@@ -35,7 +35,7 @@ struct unclog_levels_s {
     {UNCLOG_LEVEL_TRACE, "Trace"}, {-1, NULL},
 };
 
-int unclog_level(const char* name) {
+static int unclog_level(const char* name) {
     struct unclog_levels_s* ul = unclog_levels;
     for (; ul->name != NULL; ul++) {
         if (MATCH(ul->name, name)) return ul->level;
@@ -43,7 +43,7 @@ int unclog_level(const char* name) {
     return -1;
 }
 
-struct unclog_details_s {
+static struct unclog_details_s {
     uint32_t detail;
     const char* name;
 } unclog_details[] = {
@@ -53,7 +53,7 @@ struct unclog_details_s {
     {UNCLOG_DETAILS_FULL, "Full"},      {-1, NULL},
 };
 
-uint32_t unclog_detail(const char* name) {
+static uint32_t unclog_detail(const char* name) {
     struct unclog_details_s* ud = unclog_details;
     for (; ud->name != NULL; ud++) {
         if (MATCH(ud->name, name)) return ud->detail;
@@ -62,7 +62,7 @@ uint32_t unclog_detail(const char* name) {
 }
 
 // create a configuration key-value pair
-unclog_config_value_t* unclog_config_value_create(const char* name, const char* value) {
+static unclog_config_value_t* unclog_config_value_create(const char* name, const char* value) {
     unclog_config_value_t* v = malloc_and_clear(sizeof(unclog_config_value_t));
     v->name = strdup(name);
     v->value = strdup(value);
@@ -84,7 +84,7 @@ typedef struct unclog_config_s {
 // logging source only needs a logging level and a name for finding its
 // configuration
 typedef struct unclog_source_s {
-    int level;
+    int level;  // this level is the same as in unclog_t
     char* name;
 
     LIST_ENTRY(unclog_source_s) entries;
@@ -123,22 +123,32 @@ static unclog_config_t* _unclog_config_create(const char* name, int level, uint3
 }
 
 // search for a configuration, either get an exact match for the name (for
-// adding to the config) or a longest match to get tiered config values also
-// there is a config with empty name ("") that serves for storing the defaults
-static unclog_config_t* _unclog_config_get(const char* source, int exact_match) {
+// adding to the config) or a longest match to get tiered config values.
+// also there is a config with empty name ("") that serves for storing the
+// defaults
+static unclog_config_t* _unclog_config_get(const char* prefix, const char* source,
+                                           int exact_match) {
+    char* configname;
+    if (prefix != NULL)
+        asprintf(&configname, "%s.%s", prefix, source);
+    else
+        asprintf(&configname, "%s", source);
+
     int final_size = -1;
     unclog_config_t* final = NULL;
 
     unclog_config_t* c = unclog_global->configs.lh_first;
     for (; c != NULL; c = c->entries.le_next) {
-        if (c->name_size > final_size && strncmp(source, c->name, c->name_size) == 0) {
+        if (c->name_size > final_size && strncmp(configname, c->name, c->name_size) == 0) {
             final_size = c->name_size;
             final = c;
         }
     }
 
     // when an exact_match is required make sure the found item matches
-    if (exact_match && final != NULL && !MATCH(final->name, source)) return NULL;
+    if (exact_match && final != NULL && !MATCH(final->name, configname)) final = NULL;
+
+    free(configname);
     return final;
 }
 
@@ -151,11 +161,11 @@ static int _unclog_config_handler(void* user, const char* section, const char* n
     (void)user;
     fprintf(stderr, "CONFIG: %s: %s=%s\n", section, name, value);
 
-    char* configname = "";
+    const char* configname = "";
     if (!MATCH(section, "defaults")) {
         configname = section;
     }
-    unclog_config_t* c = _unclog_config_get(configname, 1);
+    unclog_config_t* c = _unclog_config_get(NULL, configname, 1);
     if (c == NULL) {
         c = _unclog_config_create(configname, UNCLOG_LEVEL_DEFAULT, UNCLOG_DETAILS_DEFAULT);
         LIST_INSERT_HEAD(&unclog_global->configs, c, entries);
@@ -183,27 +193,62 @@ static int _unclog_config_handler(void* user, const char* section, const char* n
     return 0;
 }
 
-static void _unclog_config(void) {
-    const char** f = unclog_config_locations;
-    for (; *f != NULL; f++) {
-        if (access(*f, R_OK) != 0) continue;
-        fprintf(stderr, "read config from %s\n", *f);
-        ini_parse(*f, _unclog_config_handler, NULL);
-        break;
+// remove all configuration values and clean up memory
+static void _unclog_config_clear(void) {
+    unclog_config_t* c = unclog_global->configs.lh_first;
+    while (c != NULL) {
+        LIST_REMOVE(c, entries);
+
+        while (c->config != NULL) {
+            unclog_config_value_t* v = c->config;
+            c->config = c->config->next;
+            free(v->name);
+            free(v->value);
+            free(v);
+        }
+        free(c->name);
+        free(c);
+
+        c = unclog_global->configs.lh_first;
     }
 }
 
-static unclog_source_t* unclog_source_create_or_get(const char* source) {
-    pthread_rwlock_wrlock(&unclog_mutex);
+// update the configuration store, this does not touch the sources or sinks,
+// just the config
+// - first clear up the config and install default config (this default might
+//   be updated by the config but at least the default must be there)
+// - if the input config pointer is not NULL, us that config
+// - else search for files in unclog_config_locations
+static void _unclog_config(const char* config) {
+    _unclog_config_clear();
+
+    unclog_config_t* c = _unclog_config_create("", UNCLOG_LEVEL_DEFAULT, UNCLOG_DETAILS_DEFAULT);
+    LIST_INSERT_HEAD(&unclog_global->configs, c, entries);
+
+    if (config != NULL) {
+        ini_parse_string(config, _unclog_config_handler, NULL);
+        return;
+    }
+    const char** f = unclog_config_locations;
+    for (; *f != NULL; f++) {
+        if (access(*f, R_OK) == 0) {
+            fprintf(stderr, "read config from %s\n", *f);
+            ini_parse(*f, _unclog_config_handler, NULL);
+            return;
+        }
+    }
+}
+
+// gets or creates source. when the new source is created the config is fetched
+// and the level is copied over
+static unclog_source_t* _unclog_source_create_or_get(const char* source) {
     unclog_source_t* s = unclog_global->sources.lh_first;
     for (; s != NULL; s = s->entries.le_next) {
         if (MATCH(s->name, source)) break;
     }
+
     if (s == NULL) {
-        char* configname;
-        asprintf(&configname, "source.%s", source);
-        unclog_config_t* config = _unclog_config_get(configname, 0);
-        free(configname);
+        unclog_config_t* config = _unclog_config_get("source", source, 0);
 
         s = malloc_and_clear(sizeof(unclog_source_t));
         s->name = strdup(source);
@@ -211,12 +256,12 @@ static unclog_source_t* unclog_source_create_or_get(const char* source) {
 
         LIST_INSERT_HEAD(&unclog_global->sources, s, entries);
     }
-    pthread_rwlock_unlock(&unclog_mutex);
 
     return s;
 }
 
-static void unclog_global_create(void) {
+// create, initialize and configure new logging single logging instance
+static void unclog_global_create_and_lock(const char* config) {
     pthread_rwlock_wrlock(&unclog_mutex);
     if (unclog_global == NULL) {
         unclog_global = malloc_and_clear(sizeof(unclog_global_t));
@@ -224,26 +269,31 @@ static void unclog_global_create(void) {
         LIST_INIT(&unclog_global->sources);
         LIST_INIT(&unclog_global->sinks);
 
-        unclog_config_t* c =
-            _unclog_config_create("", UNCLOG_LEVEL_DEFAULT, UNCLOG_DETAILS_DEFAULT);
-        LIST_INSERT_HEAD(&unclog_global->configs, c, entries);
-
-        _unclog_config();
+        _unclog_config(config);
+    } else if (config != NULL) {
+        _unclog_config(config);
     }
-    pthread_rwlock_unlock(&unclog_mutex);
 }
 
+// initializes libary if not done, fetch or create source
 unclog_t* unclog_open(const char* source) {
-    if (unclog_global == NULL) {
-        unclog_global_create();
-    }
+    unclog_global_create_and_lock(NULL);
 
-    unclog_source_t* h = unclog_source_create_or_get(source);
+    unclog_source_t* h = _unclog_source_create_or_get(source);
+
+    pthread_rwlock_unlock(&unclog_mutex);
     return (unclog_t*)h;
 }
 
+// the actual logging call:
+// - check if handle is valid, and if the level checks out
+// - fill up data structure
+// - call all the logging sinks
 void unclog_log(unclog_data_t data, ...) {
     if (data.ha == NULL) return;
+    unclog_source_t* source = (unclog_source_t*)data.ha;
+
+    if (!UNCLOG_LEVEL_COMPARE(data.le, source->level)) return;
 
     time_t now = time(NULL);
     gmtime_r(&now, &data.ti);
@@ -261,6 +311,8 @@ void unclog_log(unclog_data_t data, ...) {
     pthread_rwlock_unlock(&unclog_mutex);
 }
 
+// remove source and free up memory. if this was the last source, close down
+// the library
 void unclog_close(unclog_t* handle) {
     unclog_source_t* source = (unclog_source_t*)handle;
 
@@ -270,21 +322,8 @@ void unclog_close(unclog_t* handle) {
     free(source);
 
     if (unclog_global->sources.lh_first == NULL) {
-        unclog_config_t* c = unclog_global->configs.lh_first;
-        while (c != NULL) {
-            unclog_config_t* d = c;
-            c = c->entries.le_next;
+        _unclog_config_clear();
 
-            while (d->config != NULL) {
-                unclog_config_value_t* v = d->config;
-                d->config = d->config->next;
-                free(v->name);
-                free(v->value);
-                free(v);
-            }
-            free(d->name);
-            free(d);
-        }
         unclog_sink_t* s = unclog_global->sinks.lh_first;
         while (s != NULL) {
             unclog_sink_t* d = s;
@@ -301,17 +340,16 @@ void unclog_close(unclog_t* handle) {
     pthread_rwlock_unlock(&unclog_mutex);
 }
 
+// register sink:
+// - first make sure library is initialized
+// - fetch config and create sink
+// - depending on settings and parameters configure sink
+// - call init method and store in list
 void unclog_sink_register(const char* name, int level, uint32_t details,
                           unclog_sink_methods_t methods) {
-    if (unclog_global == NULL) {
-        unclog_global_create();
-    }
+    unclog_global_create_and_lock(NULL);
 
-    char* configname;
-    asprintf(&configname, "sink.%s", name);
-
-    pthread_rwlock_wrlock(&unclog_mutex);
-    unclog_config_t* c = _unclog_config_get(configname, 0);
+    unclog_config_t* c = _unclog_config_get("sink", name, 0);
 
     unclog_sink_t* sink = malloc_and_clear(sizeof(unclog_sink_t));
     if (level != UNCLOG_LEVEL_NONE)
@@ -328,7 +366,16 @@ void unclog_sink_register(const char* name, int level, uint32_t details,
     sink->methods.init(&sink->internal, sink->details, c->config);
 
     LIST_INSERT_HEAD(&unclog_global->sinks, sink, entries);
-    pthread_rwlock_unlock(&unclog_mutex);
 
-    free(configname);
+    pthread_rwlock_unlock(&unclog_mutex);
+}
+
+void unclog_config(const char* config) {
+    unclog_global_create_and_lock(config);
+
+    unclog_source_t* s = unclog_global->sources.lh_first;
+    for (; s != NULL; s = s->entries.le_next) {
+        unclog_config_t* config = _unclog_config_get("source", s->name, 0);
+        s->level = config->level;
+    }
 }

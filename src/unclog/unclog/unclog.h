@@ -37,7 +37,9 @@ extern "C" {
 // the semi-transpared logging handle, level is accessible from outside so the
 // logging defines can make a decision about logging without acually doing the
 // call
-typedef struct unclog_s { int level; } unclog_t;
+typedef struct unclog_s {
+    int level;  // this level is the same as in unclog_source_t
+} unclog_t;
 
 // a data structure that is filled during a logging call, this can then be
 // handed to the logging sinks without
