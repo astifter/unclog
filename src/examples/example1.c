@@ -26,7 +26,7 @@ void customsink_init(void** data, uint32_t details, unclog_config_value_t* confi
 // logging event, list contains the va_list from unclog_log
 // the data stored in the init method is found in data->data
 void customsink_log(unclog_data_t* data, va_list list) {
-    customsink_data_t* d = data->da;
+    customsink_data_t* d = data->si;
     char* msg;
     char* fmt = va_arg(list, char*);
     vasprintf(&msg, fmt, list);

@@ -48,14 +48,16 @@ typedef struct unclog_s {
 // the time in ti and the data in da is filled during the logging call by the
 // library
 typedef struct unclog_data_s {
-    unclog_t* ha;
-    int le;
-    const char* fi;
-    const char* fu;
-    unsigned int li;
+    unclog_t* ha;     // logging handle
+    int le;           // level
+    const char* fi;   // filename
+    const char* fu;   // function
+    unsigned int li;  // line
 
-    struct tm ti;
-    void* da;
+    struct tm ti;  // time
+
+    char* so;  // source name
+    void* si;  // sink internal data
 } unclog_data_t;
 
 // the open, log and close methods:

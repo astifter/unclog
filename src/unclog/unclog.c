@@ -1,6 +1,7 @@
 #include <unclog/unclog_adv.h>
 
 #include <ini.h>
+#include <unclog_sink.h>
 
 #include <pthread.h>
 #include <stdarg.h>
@@ -166,7 +167,7 @@ static unclog_config_t* _unclog_config_get(const char* prefix, const char* sourc
 static int _unclog_config_handler(void* user, const char* section, const char* name,
                                   const char* value) {
     (void)user;
-    if (LOG()) fprintf(stderr, "CONFIG: %s: %s=%s\n", section, name, value);
+    if (LOG()) fprintf(stderr, "unclog.config: %s: %s=%s\n", section, name, value);
 
     const char* configname = "";
     if (!MATCH(section, "defaults")) {
@@ -241,7 +242,7 @@ static void _unclog_config(const char* config) {
     const char** f = unclog_config_locations;
     for (; *f != NULL; f++) {
         if (access(*f, R_OK) == 0) {
-            if (LOG()) fprintf(stderr, "read config from %s\n", *f);
+            if (LOG()) fprintf(stderr, "unclog: read config from %s\n", *f);
             ini_parse(*f, _unclog_config_handler, NULL);
             return;
         }
@@ -308,12 +309,15 @@ void unclog_log(unclog_data_t data, ...) {
 
     time_t now = time(NULL);
     gmtime_r(&now, &data.ti);
+    data.so = source->name;
 
     pthread_rwlock_rdlock(&unclog_mutex);
     unclog_sink_t* sink = unclog_global->sinks.lh_first;
     for (; sink != NULL; sink = sink->entries.le_next) {
         if (!UNCLOG_LEVEL_COMPARE(data.le, sink->level)) continue;
-        data.da = sink->internal;
+
+        data.si = sink->internal;
+
         va_list list;
         va_start(list, data);
         sink->methods.log(&data, list);
@@ -375,6 +379,11 @@ void unclog_close(unclog_t* handle) {
 // - call init method and store in list
 void unclog_sink_register(const char* name, int level, uint32_t details,
                           unclog_sink_methods_t methods) {
+    if (methods.log == NULL) {
+        if (LOG()) fprintf(stderr, "unclog: sink %s has no method.log\n", name);
+        return;
+    }
+
     unclog_global_create_and_lock(NULL);
     unclog_global->flags |= UNCLOG_FLAGS_MANUAL;
 
@@ -392,7 +401,7 @@ void unclog_sink_register(const char* name, int level, uint32_t details,
     sink->name = strdup(name);
     sink->methods = methods;
 
-    sink->methods.init(&sink->internal, sink->details, c->config);
+    if (sink->methods.init != NULL) sink->methods.init(&sink->internal, sink->details, c->config);
 
     LIST_INSERT_HEAD(&unclog_global->sinks, sink, entries);
 
