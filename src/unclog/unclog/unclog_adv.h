@@ -28,6 +28,7 @@ typedef struct unclog_config_value_s {
     char* value;
     struct unclog_config_value_s* next;
 } unclog_config_value_t;
+char* unclog_config_value_get(unclog_config_value_t* v, const char* name);
 
 // the methods to be implemented by a logging sink
 typedef void (*unclog_sink_init_t)(void** data, uint32_t details, unclog_config_value_t* config);
@@ -45,5 +46,5 @@ typedef struct unclog_sink_methods_s {
 // UNCLOG_LEVEL_NONE and details can be UNCLOG_DETAILS_NONE to get the
 // configured values
 // a section with [sink.<name>] can be used to configure the sink in the config
-void unclog_sink_register(const char* name, int level, uint32_t details,
-                          unclog_sink_methods_t methods);
+void* unclog_sink_register_or_get(const char* name, int level, uint32_t details,
+								  unclog_sink_methods_t methods);

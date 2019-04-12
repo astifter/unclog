@@ -1,6 +1,6 @@
 #define _BSD_SOURCE
 
-#include <unclog_int.h>
+#include <unclog/unclog_adv.h>
 
 #include <CUnit/Basic.h>
 #include <CUnit/CUnit.h>

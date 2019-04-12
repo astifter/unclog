@@ -2,7 +2,7 @@
 
 #include <unclog/unclog_adv.h>
 
-#include <limits.h>
+#include <linux/limits.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,15 +11,6 @@
 //#define NOIL __attribute__((noinline))
 #define NOIL inline
 #define MATCH(s1, s2) (strcmp(s1, s2) == 0)
-
-static char* unclog_config_value_get(unclog_config_value_t* v, const char* name) {
-    while (v != NULL) {
-        if (MATCH(v->name, name)) {
-            return v->value;
-        }
-    }
-    return NULL;
-}
 
 static struct {
     int l;
@@ -88,6 +79,7 @@ static NOIL size_t unclog_sink_default(char* buffer, unclog_data_t* data, uint32
         needsspace = 1;
     }
     *bufferpos++ = '\n';
+    *bufferpos = '\0';
 
     return bufferpos - buffer;
 }
@@ -116,6 +108,11 @@ static void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
     unclog_sink_default(buffer, data, sink->details, list);
     unclog_sink_fprintf(buffer);
     sink->messages++;
+}
+
+uint64_t unclog_sink_stderr_get_num_messages(void* data) {
+    unclog_sink_stderr_data_t* sink = data;
+	return sink->messages;
 }
 
 static void unclog_sink_stderr_deinit(void* data) { free(data); }
@@ -155,12 +152,7 @@ static void unclog_sink_file_deinit(void* data) {
     }
 }
 
-typedef struct unclog_sink_list_s {
-    const char* name;
-    unclog_sink_methods_t methods;
-} unclog_sink_list_t;
-
-unclog_sink_list_t unclog_default_sinks[] = {
+unclog_sink_list_t unclog_sink_list[] = {
     {"stderr", {unclog_sink_stderr_init, unclog_sink_stderr_log, unclog_sink_stderr_deinit}},
     {"file", {unclog_sink_file_init, unclog_sink_file_log, unclog_sink_file_deinit}},
     {NULL, {NULL}},

@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 // include advanced header for using custom sink, this also includes the
 // regular unclog/unclog.h
 #include <unclog/unclog_adv.h>
@@ -11,11 +13,12 @@ typedef struct customsink_data_s { uint32_t details; } customsink_data_t;
 // the initalization for the custom sink, data can be stored to the data
 // pointer
 void customsink_init(void** data, uint32_t details, unclog_config_value_t* config) {
-    customsink_data_t* d = malloc(sizeof(customsink_data_t));
-    d->details = details;
-    *data = d;
+    customsink_data_t* sink = malloc(sizeof(customsink_data_t));
+    sink->details = details;
+    *data = sink;
 
-    fprintf(stderr, "%s:%d initialized with details 0x%08u\n", __FUNCTION__, __LINE__, d->details);
+    fprintf(stderr, "%s:%d initialized with details 0x%08u\n", __FUNCTION__, __LINE__,
+            sink->details);
     for (unclog_config_value_t* v = config; v != NULL; v = v->next) {
         fprintf(stderr, "%s:%d initialized with config %s=%s\n", __FUNCTION__, __LINE__, v->name,
                 v->value);
@@ -26,11 +29,12 @@ void customsink_init(void** data, uint32_t details, unclog_config_value_t* confi
 // logging event, list contains the va_list from unclog_log
 // the data stored in the init method is found in data->data
 void customsink_log(unclog_data_t* data, va_list list) {
-    customsink_data_t* d = data->si;
+    customsink_data_t* sink = data->si;
+
     char* msg;
     char* fmt = va_arg(list, char*);
     vasprintf(&msg, fmt, list);
-    fprintf(stderr, "%s:%d log 0x%08u %s\n", __FUNCTION__, __LINE__, d->details, msg);
+    fprintf(stderr, "%s:%d log 0x%08u %s\n", __FUNCTION__, __LINE__, sink->details, msg);
     free(msg);
 }
 
@@ -49,7 +53,7 @@ int main(int argc, char** argv) {
 
     // first register a custom sink, since unclog is not initialized internally
     // the initialization is done as well
-    unclog_sink_register("custom1", UNCLOG_LEVEL_NONE, UNCLOG_DETAILS_NONE, customsink);
+    unclog_sink_register_or_get("custom1", UNCLOG_LEVEL_NONE, UNCLOG_DETAILS_NONE, customsink);
 
     // open a logging source "main", when this is called for the first time
     // during the process' lifetime the unclog.ini is searched for and

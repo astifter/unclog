@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <unclog/unclog_adv.h>
 
 #include <ini.h>
@@ -14,6 +16,9 @@
 // have a define for strcmp to prevent code duplication
 #define MATCH(s1, s2) (strcmp(s1, s2) == 0)
 #define LOG() ((unclog_global != NULL) && (unclog_global->flags & UNCLOG_FLAGS_LOG))
+
+#define UNCLOG_FLAGS_MANUAL 0x0001
+#define UNCLOG_FLAGS_LOG 0x0002
 
 // list if locations for unclog.ini files
 static const char* unclog_config_locations[] = {
@@ -73,8 +78,18 @@ static unclog_config_value_t* unclog_config_value_create(const char* name, const
     return v;
 }
 
+// get config value from list
+char* unclog_config_value_get(unclog_config_value_t* v, const char* name) {
+    for (; v != NULL; v = v->next) {
+        if (MATCH(v->name, name)) {
+            return v->value;
+        }
+    }
+    return NULL;
+}
+
 // config holds a bunch of values from a configuration section, details are
-// only used for sinks.
+// only used for sinks
 typedef struct unclog_config_s {
     int level;
     uint32_t details;
@@ -101,12 +116,10 @@ typedef struct unclog_sink_s {
     char* name;
     struct unclog_sink_methods_s methods;
     void* internal;
+    uint32_t flags;
 
     LIST_ENTRY(unclog_sink_s) entries;
 } unclog_sink_t;
-
-#define UNCLOG_FLAGS_MANUAL 0x0001
-#define UNCLOG_FLAGS_LOG 0x0002
 
 // the global configuration structure holds lists of configs, sources and sinks
 typedef struct unclog_global_s {
@@ -204,9 +217,9 @@ static int _unclog_config_handler(void* user, const char* section, const char* n
 }
 
 // remove all configuration values and clean up memory
-static void _unclog_config_clear(void) {
+static void _unclog_config_clear(int full) {
     unclog_config_t* c = unclog_global->configs.lh_first;
-    while (c != NULL) {
+    for (; c != NULL; c = unclog_global->configs.lh_first) {
         LIST_REMOVE(c, entries);
 
         while (c->config != NULL) {
@@ -218,9 +231,58 @@ static void _unclog_config_clear(void) {
         }
         free(c->name);
         free(c);
-
-        c = unclog_global->configs.lh_first;
     }
+
+    while (1) {
+        int removed = 0;
+        unclog_sink_t* sink = unclog_global->sinks.lh_first;
+        for (; sink != NULL; sink = sink->entries.le_next) {
+            if (sink->flags & UNCLOG_FLAGS_MANUAL && !full) continue;
+
+            LIST_REMOVE(sink, entries);
+            removed = 1;
+
+            sink->methods.deinit(sink->internal);
+            free(sink->name);
+            free(sink);
+            break;
+        }
+        if (removed == 0) break;
+    }
+}
+
+// fetch sink with name
+unclog_sink_t* _unclog_sink_get(const char* name) {
+    unclog_sink_t* sink = unclog_global->sinks.lh_first;
+    for (; sink != NULL; sink = sink->entries.le_next) {
+        if (MATCH(sink->name, name)) return sink;
+    }
+    return NULL;
+}
+
+// register new sink
+static void* _unclog_sink_register(const char* name, int level, uint32_t details,
+                                   unclog_sink_methods_t methods) {
+    unclog_sink_t* sink = malloc_and_clear(sizeof(unclog_sink_t));
+    sink->name = strdup(name);
+    sink->methods = methods;
+    sink->flags |= UNCLOG_FLAGS_MANUAL;
+
+    unclog_config_t* c = _unclog_config_get("sink", sink->name, 0);
+    if (level != UNCLOG_LEVEL_NONE)
+        sink->level = level;
+    else
+        sink->level = c->level;
+    if (details != UNCLOG_DETAILS_NONE)
+        sink->details = details;
+    else
+        sink->details = c->details;
+
+    if (sink->methods.init != NULL) sink->methods.init(&sink->internal, sink->details, c->config);
+
+    LIST_INSERT_HEAD(&unclog_global->sinks, sink, entries);
+
+	return sink;
 }
 
 // update the configuration store, this does not touch the sources or sinks,
@@ -230,21 +292,34 @@ static void _unclog_config_clear(void) {
 // - if the input config pointer is not NULL, us that config
 // - else search for files in unclog_config_locations
 static void _unclog_config(const char* config) {
-    _unclog_config_clear();
+    _unclog_config_clear(0);
 
     unclog_config_t* c = _unclog_config_create("", UNCLOG_LEVEL_DEFAULT, UNCLOG_DETAILS_DEFAULT);
     LIST_INSERT_HEAD(&unclog_global->configs, c, entries);
 
     if (config != NULL) {
         ini_parse_string(config, _unclog_config_handler, NULL);
-        return;
+    } else {
+        const char** f = unclog_config_locations;
+        for (; *f != NULL; f++) {
+            if (access(*f, R_OK) == 0) {
+                if (LOG()) fprintf(stderr, "unclog: read config from %s\n", *f);
+                ini_parse(*f, _unclog_config_handler, NULL);
+                break;
+            }
+        }
     }
-    const char** f = unclog_config_locations;
-    for (; *f != NULL; f++) {
-        if (access(*f, R_OK) == 0) {
-            if (LOG()) fprintf(stderr, "unclog: read config from %s\n", *f);
-            ini_parse(*f, _unclog_config_handler, NULL);
-            return;
+
+    c = unclog_global->configs.lh_first;
+    for (; c != NULL; c = c->entries.le_next) {
+        if (strncmp(c->name, "sink.", 5) != 0) continue;
+        unclog_sink_t* sink = _unclog_sink_get(c->name);
+        if (sink != NULL) continue;
+        char* type = unclog_config_value_get(c->config, "Type");
+        if (type == NULL) continue;
+        for (unclog_sink_list_t* l = unclog_sink_list; l->name != NULL; l++) {
+            if (!MATCH(type, l->name)) continue;
+            _unclog_sink_register(c->name, c->level, c->details, l->methods);
         }
     }
 }
@@ -328,18 +403,7 @@ void unclog_log(unclog_data_t data, ...) {
 
 // clean up library and shutdown everything
 static void _unclog_deinit(void) {
-    _unclog_config_clear();
-
-    unclog_sink_t* sink = unclog_global->sinks.lh_first;
-    while (sink != NULL) {
-        LIST_REMOVE(sink, entries);
-
-        sink->methods.deinit(sink->internal);
-        free(sink->name);
-        free(sink);
-
-        sink = unclog_global->sinks.lh_first;
-    }
+    _unclog_config_clear(1);
 
     unclog_source_t* source = unclog_global->sources.lh_first;
     while (source != NULL) {
@@ -377,35 +441,23 @@ void unclog_close(unclog_t* handle) {
 // - fetch config and create sink
 // - depending on settings and parameters configure sink
 // - call init method and store in list
-void unclog_sink_register(const char* name, int level, uint32_t details,
-                          unclog_sink_methods_t methods) {
+void* unclog_sink_register_or_get(const char* name, int level, uint32_t details,
+								  unclog_sink_methods_t methods) {
     if (methods.log == NULL) {
         if (LOG()) fprintf(stderr, "unclog: sink %s has no method.log\n", name);
-        return;
+        return NULL;
     }
 
     unclog_global_create_and_lock(NULL);
     unclog_global->flags |= UNCLOG_FLAGS_MANUAL;
 
-    unclog_config_t* c = _unclog_config_get("sink", name, 0);
-
-    unclog_sink_t* sink = malloc_and_clear(sizeof(unclog_sink_t));
-    if (level != UNCLOG_LEVEL_NONE)
-        sink->level = level;
-    else
-        sink->level = c->level;
-    if (details != UNCLOG_DETAILS_NONE)
-        sink->details = details;
-    else
-        sink->details = c->details;
-    sink->name = strdup(name);
-    sink->methods = methods;
-
-    if (sink->methods.init != NULL) sink->methods.init(&sink->internal, sink->details, c->config);
-
-    LIST_INSERT_HEAD(&unclog_global->sinks, sink, entries);
+	unclog_sink_t* sink = _unclog_sink_get(name);
+	if (sink == NULL)
+		sink = _unclog_sink_register(name, level, details, methods);
 
     pthread_rwlock_unlock(&unclog_mutex);
+
+    return sink->internal;
 }
 
 // configures/reconfigures unclog:
@@ -425,6 +477,7 @@ void unclog_config(const char* config) {
     pthread_rwlock_unlock(&unclog_mutex);
 }
 
+// clean up unclog library
 void unclog_deinit(void) {
     pthread_rwlock_wrlock(&unclog_mutex);
     _unclog_deinit();

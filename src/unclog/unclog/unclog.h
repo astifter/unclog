@@ -1,10 +1,5 @@
 #pragma once
 
-#ifndef _POSIX_C_SOURCE
-#define _POSIX_C_SOURCE 199309L
-#endif
-#define _GNU_SOURCE
-
 #include <time.h>
 
 #ifdef __cplusplus
@@ -28,6 +23,7 @@ extern "C" {
 #ifndef UNCLOG_LEVEL_DEFAULT
 #define UNCLOG_LEVEL_DEFAULT UNCLOG_LEVEL_WARNING
 #endif
+
 #ifndef UNCLOG_DETAILS_DEFAULT
 #define UNCLOG_DETAILS_DEFAULT                                                 \
     (UNCLOG_DETAILS_TIMESTAMP | UNCLOG_DETAILS_LEVEL | UNCLOG_DETAILS_SOURCE | \
