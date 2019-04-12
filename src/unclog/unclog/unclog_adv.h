@@ -5,9 +5,10 @@
 #include <stdarg.h>
 #include <stdint.h>
 
-// it is possible to preload unclog with a config for when no config files
-// should be used
-// also unclog can be deinitialized centrally
+// initialize and configure, this is currently the same as unclog_config() but
+// kept for furhter use. when unclog is initialized like this, unclog does not
+// close by itself and has to be cleaned up by unclog_deinit()
+void unclog_init(const char* config);
 void unclog_config(const char* config);
 void unclog_deinit(void);
 

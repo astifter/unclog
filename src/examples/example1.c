@@ -35,7 +35,10 @@ void customsink_log(unclog_data_t* data, va_list list) {
 }
 
 // clean up sink and open resources
-void customsink_deinit(void* data) { free(data); }
+void customsink_deinit(void* data) {
+    fprintf(stderr, "%s:%d deinitialized\n", __FUNCTION__, __LINE__);
+    free(data);
+}
 
 // collect methods for registering sink
 unclog_sink_methods_t customsink = {customsink_init, customsink_log, customsink_deinit};
@@ -95,5 +98,8 @@ int main(int argc, char** argv) {
     // now close logger2 as well
     unclog_close(logger2);
 
+    // when unclog_sink_register() or unclog_init()/unclog_config() are used
+    // unclog has to be deinitialized as well
+    unclog_deinit();
     // all internal logging resources are freed now
 }
