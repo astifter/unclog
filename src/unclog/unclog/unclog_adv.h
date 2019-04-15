@@ -47,4 +47,4 @@ typedef struct unclog_sink_methods_s {
 // configured values
 // a section with [sink.<name>] can be used to configure the sink in the config
 void* unclog_sink_register_or_get(const char* name, int level, uint32_t details,
-								  unclog_sink_methods_t methods);
+                                  unclog_sink_methods_t* methods);

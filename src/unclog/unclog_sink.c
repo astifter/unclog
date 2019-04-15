@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define NOIL __attribute__((noinline))
-#define NOIL inline
+#define NOIL __attribute__((noinline))
+//#define NOIL inline
 #define MATCH(s1, s2) (strcmp(s1, s2) == 0)
 
 static struct {
@@ -96,6 +96,7 @@ static void unclog_sink_stderr_init(void** data, uint32_t details, unclog_config
 
     unclog_sink_stderr_data_t* sink = malloc(sizeof(unclog_sink_stderr_data_t));
     sink->details = details;
+    sink->messages = 0;
 
     *data = sink;
 }
@@ -112,7 +113,7 @@ static void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
 
 uint64_t unclog_sink_stderr_get_num_messages(void* data) {
     unclog_sink_stderr_data_t* sink = data;
-	return sink->messages;
+    return sink->messages;
 }
 
 static void unclog_sink_stderr_deinit(void* data) { free(data); }
@@ -127,6 +128,7 @@ typedef struct unclog_sink_file_data_s {
 static void unclog_sink_file_init(void** data, uint32_t details, unclog_config_value_t* config) {
     unclog_sink_file_data_t* sink = malloc(sizeof(unclog_sink_file_data_t));
     sink->details = details;
+    sink->file = NULL;
 
     char* filename = unclog_config_value_get(config, "File");
     if (filename == NULL) filename = unclog_sink_file_default_log;

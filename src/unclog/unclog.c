@@ -106,6 +106,8 @@ typedef struct unclog_source_s {
     int level;  // this level is the same as in unclog_t
     char* name;
 
+    uint32_t refcnt;
+
     LIST_ENTRY(unclog_source_s) entries;
 } unclog_source_t;
 
@@ -116,6 +118,7 @@ typedef struct unclog_sink_s {
     char* name;
     struct unclog_sink_methods_s methods;
     void* internal;
+
     uint32_t flags;
 
     LIST_ENTRY(unclog_sink_s) entries;
@@ -188,7 +191,7 @@ static int _unclog_config_handler(void* user, const char* section, const char* n
     }
     unclog_config_t* c = _unclog_config_get(NULL, configname, 1);
     if (c == NULL) {
-        c = _unclog_config_create(configname, UNCLOG_LEVEL_DEFAULT, UNCLOG_DETAILS_DEFAULT);
+        c = _unclog_config_create(configname, UNCLOG_LEVEL_NONE, UNCLOG_DETAILS_NONE);
         LIST_INSERT_HEAD(&unclog_global->configs, c, entries);
     }
 
@@ -253,6 +256,8 @@ static void _unclog_config_clear(int full) {
 
 // fetch sink with name
 unclog_sink_t* _unclog_sink_get(const char* name) {
+    if (unclog_global == NULL) return NULL;
+
     unclog_sink_t* sink = unclog_global->sinks.lh_first;
     for (; sink != NULL; sink = sink->entries.le_next) {
         if (MATCH(sink->name, name)) return sink;
@@ -262,10 +267,10 @@ unclog_sink_t* _unclog_sink_get(const char* name) {
 
 // register new sink
 static void* _unclog_sink_register(const char* name, int level, uint32_t details,
-                                   unclog_sink_methods_t methods) {
+                                   unclog_sink_methods_t* methods) {
     unclog_sink_t* sink = malloc_and_clear(sizeof(unclog_sink_t));
     sink->name = strdup(name);
-    sink->methods = methods;
+    memcpy(&sink->methods, methods, sizeof(unclog_sink_methods_t));
     sink->flags |= UNCLOG_FLAGS_MANUAL;
 
     unclog_config_t* c = _unclog_config_get("sink", sink->name, 0);
@@ -282,7 +287,7 @@ static void* _unclog_sink_register(const char* name, int level, uint32_t details
 
     LIST_INSERT_HEAD(&unclog_global->sinks, sink, entries);
 
-	return sink;
+    return sink;
 }
 
 // update the configuration store, this does not touch the sources or sinks,
@@ -319,7 +324,7 @@ static void _unclog_config(const char* config) {
         if (type == NULL) continue;
         for (unclog_sink_list_t* l = unclog_sink_list; l->name != NULL; l++) {
             if (!MATCH(type, l->name)) continue;
-            _unclog_sink_register(c->name, c->level, c->details, l->methods);
+            _unclog_sink_register(c->name, c->level, c->details, &l->methods);
         }
     }
 }
@@ -338,8 +343,11 @@ static unclog_source_t* _unclog_source_create_or_get(const char* source) {
         s = malloc_and_clear(sizeof(unclog_source_t));
         s->name = strdup(source);
         s->level = config->level;
+        s->refcnt = 1;
 
         LIST_INSERT_HEAD(&unclog_global->sources, s, entries);
+    } else {
+        s->refcnt++;
     }
 
     return s;
@@ -425,9 +433,12 @@ void unclog_close(unclog_t* handle) {
     unclog_source_t* source = (unclog_source_t*)handle;
 
     pthread_rwlock_wrlock(&unclog_mutex);
-    LIST_REMOVE(source, entries);
-    free(source->name);
-    free(source);
+    source->refcnt--;
+    if (source->refcnt == 0) {
+        LIST_REMOVE(source, entries);
+        free(source->name);
+        free(source);
+    }
 
     int manual = unclog_global->flags & UNCLOG_FLAGS_MANUAL;
     if (unclog_global->sources.lh_first == NULL && !manual) {
@@ -442,8 +453,13 @@ void unclog_close(unclog_t* handle) {
 // - depending on settings and parameters configure sink
 // - call init method and store in list
 void* unclog_sink_register_or_get(const char* name, int level, uint32_t details,
-								  unclog_sink_methods_t methods) {
-    if (methods.log == NULL) {
+                                  unclog_sink_methods_t* methods) {
+    pthread_rwlock_rdlock(&unclog_mutex);
+    unclog_sink_t* sink = _unclog_sink_get(name);
+    pthread_rwlock_unlock(&unclog_mutex);
+    if (sink != NULL) return sink->internal;
+
+    if (methods == NULL || methods->log == NULL) {
         if (LOG()) fprintf(stderr, "unclog: sink %s has no method.log\n", name);
         return NULL;
     }
@@ -451,9 +467,7 @@ void* unclog_sink_register_or_get(const char* name, int level, uint32_t details,
     unclog_global_create_and_lock(NULL);
     unclog_global->flags |= UNCLOG_FLAGS_MANUAL;
 
-	unclog_sink_t* sink = _unclog_sink_get(name);
-	if (sink == NULL)
-		sink = _unclog_sink_register(name, level, details, methods);
+    sink = _unclog_sink_register(name, level, details, methods);
 
     pthread_rwlock_unlock(&unclog_mutex);
 

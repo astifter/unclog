@@ -2,6 +2,7 @@
 #define _POSIX_C_SOURCE 200112L
 
 #include <unclog/unclog_adv.h>
+#include "../unclog/unclog_sink.h"
 
 #include <pthread.h>
 #include <stdint.h>
@@ -9,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#define RUNTIME_SECS 10
 
 #define WAITFLAG_RANDOM 0x0001
 #define WAITFLAG_WAIT 0x0002
@@ -65,10 +68,12 @@ void* sleepthread(void* data) {
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
     char buffer[4096] = "";
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < RUNTIME_SECS; i++) {
         // int level = 1 + i % 7;
         *buffer = '\0';
-        sprintf(buffer, "[defaults]\nDetails=Full\nLevel=Trace\n[source.thread]\nLevel=Trace");
+        sprintf(buffer,
+                "[defaults]\nDetails=Full\nLevel=Trace\n[source.thread]\nLevel=Trace\n"
+                "[sink.stderr1]\nType=stderr");
 
         // unclog_global_dump_config(unclog_global);
         UL_FA(logger, "re-configuring logger:\n%s", buffer);
@@ -114,7 +119,9 @@ int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
-    unclog_config("[defaults]\nDetails=Full\nLevel=Trace\n[source.thread]\nLevel=Trace");
+    unclog_config(
+        "[defaults]\nDetails=Full\nLevel=Trace\n[source.thread]\nLevel=Trace\n"
+        "[sink.stderr1]\nType=stderr");
 
     if (argc >= 2) THREAD_COUNT = atoi(argv[1]);
 
@@ -142,7 +149,9 @@ int main(int argc, char** argv) {
     fprintf(stderr, "start %ld.%09ld seconds\n", start.tv_sec, start.tv_nsec);
     fprintf(stderr, "stop %ld.%09ld seconds\n", stop.tv_sec, stop.tv_nsec);
 
-    uint64_t sum = unclog_sink_stderr_get_num_messages();
+    void* sink =
+        unclog_sink_register_or_get("sink.stderr1", UNCLOG_LEVEL_NONE, UNCLOG_DETAILS_NONE, NULL);
+    uint64_t sum = unclog_sink_stderr_get_num_messages(sink);
 
     double msg_sec = sum / (diff.tv_sec + (diff.tv_nsec / 1000000000.0));
     char* postfix = "";
@@ -157,9 +166,9 @@ int main(int argc, char** argv) {
 
     fprintf(stdout, "%llu messages took %ld.%09ld seconds: %.3lf%s msgs/sec\n", sum, diff.tv_sec,
             diff.tv_nsec, msg_sec, postfix);
-
     fprintf(stderr, "----------------------------------------------------------------------\n");
-
     free(params);
+
+    unclog_deinit();
     return 0;
 }
