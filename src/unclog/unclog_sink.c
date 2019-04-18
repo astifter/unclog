@@ -154,8 +154,17 @@ static void unclog_sink_file_deinit(void* data) {
     }
 }
 
+static void unclog_sink_null_init(void** u1, uint32_t u2, unclog_config_value_t* u3) {
+    (void)u1, (void)u2, (void)u3;
+}
+
+static void unclog_sink_null_log(unclog_data_t* u1, va_list u2) { (void)u1, (void)u2; }
+
+static void unclog_sink_null_deinit(void* u1) { (void)u1; }
+
 unclog_sink_list_t unclog_sink_list[] = {
     {"stderr", {unclog_sink_stderr_init, unclog_sink_stderr_log, unclog_sink_stderr_deinit}},
     {"file", {unclog_sink_file_init, unclog_sink_file_log, unclog_sink_file_deinit}},
+    {"null", {unclog_sink_null_init, unclog_sink_null_log, unclog_sink_null_deinit}},
     {NULL, {NULL}},
 };

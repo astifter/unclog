@@ -191,7 +191,8 @@ static int _unclog_config_handler(void* user, const char* section, const char* n
     }
     unclog_config_t* c = _unclog_config_get(NULL, configname, 1);
     if (c == NULL) {
-        c = _unclog_config_create(configname, UNCLOG_LEVEL_NONE, UNCLOG_DETAILS_NONE);
+        unclog_config_t* defaults = _unclog_config_get(NULL, "", 1);
+        c = _unclog_config_create(configname, defaults->level, defaults->details);
         LIST_INSERT_HEAD(&unclog_global->configs, c, entries);
     }
 
@@ -324,7 +325,7 @@ static void _unclog_config(const char* config) {
         if (type == NULL) continue;
         for (unclog_sink_list_t* l = unclog_sink_list; l->name != NULL; l++) {
             if (!MATCH(type, l->name)) continue;
-            _unclog_sink_register(c->name, c->level, c->details, &l->methods);
+            _unclog_sink_register(&c->name[5], c->level, c->details, &l->methods);
         }
     }
 }
