@@ -26,7 +26,7 @@ static struct {
     {UNCLOG_LEVEL_TRACE, 'T'},
 };
 
-static char unclog_level_tochar(int l) {
+static NOIL char unclog_level_tochar(int l) {
     if (l < 0 || l > UNCLOG_LEVEL_TRACE) return unclog_level_tochars[0].c;
     return unclog_level_tochars[l].c;
 }
@@ -86,37 +86,37 @@ static NOIL size_t unclog_sink_default(char* buffer, unclog_data_t* data, uint32
 
 static NOIL void unclog_sink_fprintf(const char* buffer) { fprintf(stderr, buffer); }
 
-typedef struct unclog_sink_stderr_data_s {
-    uint32_t details;
-    uint64_t messages;
-} unclog_sink_stderr_data_t;
+typedef struct unclog_sink_stderr_data_s { uint32_t details; } unclog_sink_stderr_data_t;
 
-static void unclog_sink_stderr_init(void** data, uint32_t details, unclog_config_value_t* config) {
+static uint64_t messages = 0;
+static pthread_mutex_t message_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+static NOIL void unclog_sink_stderr_init(void** data, uint32_t details,
+                                         unclog_config_value_t* config) {
     (void)config;
 
     unclog_sink_stderr_data_t* sink = malloc(sizeof(unclog_sink_stderr_data_t));
     sink->details = details;
-    sink->messages = 0;
 
     *data = sink;
 }
 
-static void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
+static NOIL void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
     char buffer[PATH_MAX];
     *buffer = '\0';
 
     unclog_sink_stderr_data_t* sink = data->si;
     unclog_sink_default(buffer, data, sink->details, list);
     unclog_sink_fprintf(buffer);
-    sink->messages++;
+
+    pthread_mutex_lock(&message_mtx);
+    messages++;
+    pthread_mutex_unlock(&message_mtx);
 }
 
-uint64_t unclog_sink_stderr_get_num_messages(void* data) {
-    unclog_sink_stderr_data_t* sink = data;
-    return sink->messages;
-}
+NOIL uint64_t unclog_sink_stderr_get_num_messages(void) { return messages; }
 
-static void unclog_sink_stderr_deinit(void* data) { free(data); }
+static NOIL void unclog_sink_stderr_deinit(void* data) { free(data); }
 
 static char* unclog_sink_file_default_log = "unclog.log";
 
@@ -125,7 +125,8 @@ typedef struct unclog_sink_file_data_s {
     FILE* file;
 } unclog_sink_file_data_t;
 
-static void unclog_sink_file_init(void** data, uint32_t details, unclog_config_value_t* config) {
+static NOIL void unclog_sink_file_init(void** data, uint32_t details,
+                                       unclog_config_value_t* config) {
     unclog_sink_file_data_t* sink = malloc(sizeof(unclog_sink_file_data_t));
     sink->details = details;
     sink->file = NULL;
@@ -137,7 +138,7 @@ static void unclog_sink_file_init(void** data, uint32_t details, unclog_config_v
     *data = sink;
 }
 
-static void unclog_sink_file_log(unclog_data_t* data, va_list list) {
+static NOIL void unclog_sink_file_log(unclog_data_t* data, va_list list) {
     char buffer[PATH_MAX];
     *buffer = '\0';
 
@@ -146,7 +147,7 @@ static void unclog_sink_file_log(unclog_data_t* data, va_list list) {
     fwrite(buffer, size, 1, sink->file);
 }
 
-static void unclog_sink_file_deinit(void* data) {
+static NOIL void unclog_sink_file_deinit(void* data) {
     unclog_sink_file_data_t* sink = data;
     if (sink->file != NULL) {
         fclose(sink->file);
@@ -154,13 +155,13 @@ static void unclog_sink_file_deinit(void* data) {
     }
 }
 
-static void unclog_sink_null_init(void** u1, uint32_t u2, unclog_config_value_t* u3) {
+static void NOIL unclog_sink_null_init(void** u1, uint32_t u2, unclog_config_value_t* u3) {
     (void)u1, (void)u2, (void)u3;
 }
 
-static void unclog_sink_null_log(unclog_data_t* u1, va_list u2) { (void)u1, (void)u2; }
+static void NOIL unclog_sink_null_log(unclog_data_t* u1, va_list u2) { (void)u1, (void)u2; }
 
-static void unclog_sink_null_deinit(void* u1) { (void)u1; }
+static void NOIL unclog_sink_null_deinit(void* u1) { (void)u1; }
 
 unclog_sink_list_t unclog_sink_list[] = {
     {"stderr", {unclog_sink_stderr_init, unclog_sink_stderr_log, unclog_sink_stderr_deinit}},

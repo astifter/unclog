@@ -9,4 +9,4 @@ typedef struct unclog_sink_list_s {
 
 extern unclog_sink_list_t unclog_sink_list[];
 
-uint64_t unclog_sink_stderr_get_num_messages(void* data);
+uint64_t unclog_sink_stderr_get_num_messages(void);

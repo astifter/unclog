@@ -11,7 +11,7 @@
 #include <string.h>
 #include <time.h>
 
-#define RUNTIME_SECS 10
+#define RUNTIME_SECS 30
 
 #define WAITFLAG_RANDOM 0x0001
 #define WAITFLAG_WAIT 0x0002
@@ -149,9 +149,7 @@ int main(int argc, char** argv) {
     fprintf(stderr, "start %ld.%09ld seconds\n", start.tv_sec, start.tv_nsec);
     fprintf(stderr, "stop %ld.%09ld seconds\n", stop.tv_sec, stop.tv_nsec);
 
-    void* sink =
-        unclog_sink_register_or_get("sink.stderr1", UNCLOG_LEVEL_NONE, UNCLOG_DETAILS_NONE, NULL);
-    uint64_t sum = unclog_sink_stderr_get_num_messages(sink);
+    uint64_t sum = unclog_sink_stderr_get_num_messages();
 
     double msg_sec = sum / (diff.tv_sec + (diff.tv_nsec / 1000000000.0));
     char* postfix = "";
