@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['stringappend',['stringappend',['../unclog__sink_8c.html#af32b4b3fc7914b1fa83e8c384eb6808b',1,'unclog_sink.c']]]
+  ['_5funclog_5fsink_5fget',['_unclog_sink_get',['../unclog_8c.html#afb4c6d2afe5920059ea433175c784fec',1,'unclog.c']]]
 ];

@@ -7,13 +7,13 @@
 
 var indexSectionsWithContent =
 {
-  0: "_adfhiklmnrsuv",
+  0: "_cdfhilmnrstuv",
   1: "u",
   2: "ru",
-  3: "su",
-  4: "adfhiklmnrsuv",
+  3: "_u",
+  4: "cdfhilmnrstuv",
   5: "u",
-  6: "_mu"
+  6: "_lmnu"
 };
 
 var indexSectionNames =

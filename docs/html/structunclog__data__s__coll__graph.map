@@ -1,8 +1,3 @@
 <map id="unclog_data_s" name="unclog_data_s">
-<area shape="rect" id="node4" href="$structunclog__sink__methods__s.html" title="unclog_sink_methods_s" alt="" coords="435,184,598,211"/>
-<area shape="rect" id="node2" href="$structunclog__sink__s.html" title="unclog_sink_s" alt="" coords="360,365,465,392"/>
-<area shape="rect" id="node3" href="$structunclog__sink__internal__s.html" title="unclog_sink_internal_s" alt="" coords="443,275,598,301"/>
-<area shape="rect" id="node5" href="$structunclog__values__s.html" title="unclog_values_s" alt="" coords="5,275,124,301"/>
-<area shape="rect" id="node6" href="$structunclog__keyvalue__s.html" title="unclog_keyvalue_s" alt="" coords="149,275,282,301"/>
-<area shape="rect" id="node7" href="$structunclog__s.html" title="unclog_s" alt="" coords="567,5,642,32"/>
+<area shape="rect" id="node2" href="$structunclog__s.html" title="unclog_s" alt="" coords="21,5,96,32"/>
 </map>

@@ -1,14 +1,25 @@
 var unclog_8c =
 [
+    [ "unclog_config_s", "structunclog__config__s.html", "structunclog__config__s" ],
+    [ "unclog_global_s", "structunclog__global__s.html", "structunclog__global__s" ],
+    [ "unclog_sink_s", "structunclog__sink__s.html", "structunclog__sink__s" ],
+    [ "unclog_source_s", "structunclog__source__s.html", "structunclog__source__s" ],
     [ "_GNU_SOURCE", "unclog_8c.html#a369266c24eacffb87046522897a570d5", null ],
-    [ "unclog_close", "unclog_8c.html#a82c63d901f11c04dc8126fc7a360c2bd", null ],
+    [ "LOG", "unclog_8c.html#a4af4dcbcbd4d9c22575545ec2a071675", null ],
+    [ "MATCH", "unclog_8c.html#a0042826c54b9bd1e0a069a3944366d5c", null ],
+    [ "UNCLOG_FLAGS_LOG", "unclog_8c.html#af9a966a27920fcbd49c596e61202c3c0", null ],
+    [ "UNCLOG_FLAGS_MANUAL", "unclog_8c.html#ab58dc1efea0ed6096a1897ca18742fc6", null ],
+    [ "unclog_config_t", "unclog_8c.html#abac0eee048b6af0f50fc1f4d4f423760", null ],
+    [ "unclog_global_t", "unclog_8c.html#aaf33976a0e4e4874fc900442e1310962", null ],
+    [ "unclog_sink_t", "unclog_8c.html#aaaffed661f99764e4f5948e3a3262b56", null ],
+    [ "unclog_source_t", "unclog_8c.html#a828a7e2e87faa6adb6786ca3e0169070", null ],
+    [ "_unclog_sink_get", "unclog_8c.html#afb4c6d2afe5920059ea433175c784fec", null ],
+    [ "unclog_close", "unclog_8c.html#a1522df5421d5027f8d3774a7d6fdaa6a", null ],
+    [ "unclog_config", "unclog_8c.html#a9bf0afd07e07f171fda18a4edf4c0538", null ],
+    [ "unclog_config_value_get", "unclog_8c.html#aec4784aee9865d2716d9147d9b49304a", null ],
     [ "unclog_deinit", "unclog_8c.html#a8438d7debb9bf9f4dd6814b42dbd9125", null ],
     [ "unclog_init", "unclog_8c.html#a5fbfa952a110a335857f7eb388de440c", null ],
     [ "unclog_log", "unclog_8c.html#aa48451b0cd55a22d28fb89798055e89f", null ],
     [ "unclog_open", "unclog_8c.html#af264df4a8a7733581dc401cfcfeac930", null ],
-    [ "unclog_reinit", "unclog_8c.html#aea1b0f5475e4d18305f517e10fc04b55", null ],
-    [ "unclog_sink_register", "unclog_8c.html#ad975138fc47bd0b6bc848d370688b4b0", null ],
-    [ "unclog_defaults", "unclog_8c.html#a1e0d606e8e57e54a98353b774f841583", null ],
-    [ "unclog_defaults_file", "unclog_8c.html#ae244c39b44a985e055693ab4b64d7dec", null ],
-    [ "unclog_global", "unclog_8c.html#a885a6e040093081edc802a8f2b776536", null ]
+    [ "unclog_sink_register_or_get", "unclog_8c.html#aa18b6fb6c146d441b99377786f057e4e", null ]
 ];

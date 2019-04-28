@@ -1,10 +1,6 @@
 <map id="unclog.h" name="unclog.h">
-<area shape="rect" id="node2" href="$unclog__adv_8h.html" title="unclog_adv.h" alt="" coords="313,80,411,107"/>
-<area shape="rect" id="node3" href="$unclog__int_8h.html" title="unclog_int.h" alt="" coords="316,155,408,181"/>
-<area shape="rect" id="node4" href="$unclog_8c.html" title="unclog.c" alt="" coords="5,229,76,256"/>
-<area shape="rect" id="node5" href="$unclog__config_8c.html" title="unclog_config.c" alt="" coords="100,229,213,256"/>
-<area shape="rect" id="node6" href="$unclog__global_8c.html" title="unclog_global.c" alt="" coords="238,229,350,256"/>
-<area shape="rect" id="node7" href="$unclog__levels_8c.html" title="unclog_levels.c" alt="" coords="374,229,486,256"/>
-<area shape="rect" id="node8" href="$unclog__sink_8c.html" title="unclog_sink.c" alt="" coords="511,229,613,256"/>
-<area shape="rect" id="node9" href="$unclog__source_8c.html" title="unclog_source.c" alt="" coords="638,229,755,256"/>
+<area shape="rect" id="node2" href="$unclog__adv_8h.html" title="unclog_adv.h" alt="" coords="63,80,162,107"/>
+<area shape="rect" id="node3" href="$unclog_8c.html" title="unclog.c" alt="" coords="5,229,76,256"/>
+<area shape="rect" id="node4" href="$unclog__sink_8h.html" title="unclog_sink.h" alt="" coords="61,155,164,181"/>
+<area shape="rect" id="node5" href="$unclog__sink_8c.html" title="unclog_sink.c" alt="" coords="133,229,236,256"/>
 </map>

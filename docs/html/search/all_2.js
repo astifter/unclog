@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['data',['data',['../structunclog__sink__s.html#a2e24ded94339f43f638896c01747c4d7',1,'unclog_sink_s']]],
-  ['defaults',['defaults',['../structunclog__global__s.html#a9a1a47cd1bb1c1b3f76d490d556615c2',1,'unclog_global_s']]],
   ['deinit',['deinit',['../structunclog__sink__methods__s.html#aab292fedf519d52ca5b95eb12d6c2c7b',1,'unclog_sink_methods_s']]],
-  ['detail',['detail',['../structunclog__details__s.html#ac52bda76e97476419839339c3cd9a6c1',1,'unclog_details_s']]],
-  ['details',['details',['../structunclog__values__s.html#a151d1efd18b934aef3c412a6bfc7908b',1,'unclog_values_s']]]
+  ['details',['details',['../structunclog__config__s.html#a425ae841cffc350d0616a45cca93d0a5',1,'unclog_config_s::details()'],['../structunclog__sink__s.html#a13572d12659fda28030e495668ed5fb6',1,'unclog_sink_s::details()'],['../structunclog__sink__stderr__data__s.html#a09fa0263c61d1d0aa1f1b9d5f945be64',1,'unclog_sink_stderr_data_s::details()'],['../structunclog__sink__file__data__s.html#a99581bc28f197098c9c5316587c6b848',1,'unclog_sink_file_data_s::details()']]]
 ];

@@ -1,8 +1,5 @@
 <map id="unclog_sink_methods_s" name="unclog_sink_methods_s">
-<area shape="rect" id="node4" href="$structunclog__sink__internal__s.html" title="unclog_sink_internal_s" alt="" coords="289,96,444,123"/>
-<area shape="rect" id="node2" href="$structunclog__data__s.html" title="unclog_data_s" alt="" coords="196,276,303,303"/>
-<area shape="rect" id="node3" href="$structunclog__sink__s.html" title="unclog_sink_s" alt="" coords="197,187,302,213"/>
-<area shape="rect" id="node5" href="$structunclog__values__s.html" title="unclog_values_s" alt="" coords="147,96,266,123"/>
-<area shape="rect" id="node6" href="$structunclog__keyvalue__s.html" title="unclog_keyvalue_s" alt="" coords="468,96,601,123"/>
-<area shape="rect" id="node7" href="$structunclog__s.html" title="unclog_s" alt="" coords="325,187,400,213"/>
+<area shape="rect" id="node2" href="$structunclog__data__s.html" title="unclog_data_s" alt="" coords="5,95,112,121"/>
+<area shape="rect" id="node3" href="$structunclog__s.html" title="unclog_s" alt="" coords="21,5,96,32"/>
+<area shape="rect" id="node4" href="$structunclog__config__value__s.html" title="unclog_config_value_s" alt="" coords="136,95,291,121"/>
 </map>
