@@ -10,6 +10,7 @@
 
 #define NOIL __attribute__((noinline))
 //#define NOIL inline
+
 #define MATCH(s1, s2) (strcmp(s1, s2) == 0)
 
 static struct {
@@ -78,6 +79,7 @@ static NOIL size_t unclog_sink_default(char* buffer, unclog_data_t* data, uint32
         bufferpos += vsprintf(bufferpos, fmt, list);
         needsspace = 1;
     }
+
     *bufferpos++ = '\n';
     *bufferpos = '\0';
 
@@ -116,7 +118,10 @@ static NOIL void unclog_sink_stderr_log(unclog_data_t* data, va_list list) {
 
 NOIL uint64_t unclog_sink_stderr_get_num_messages(void) { return messages; }
 
-static NOIL void unclog_sink_stderr_deinit(void* data) { free(data); }
+static NOIL void unclog_sink_stderr_deinit(void* data) {
+    unclog_sink_stderr_data_t* sink = data;
+    free(sink);
+}
 
 static char* unclog_sink_file_default_log = "unclog.log";
 
@@ -151,8 +156,8 @@ static NOIL void unclog_sink_file_deinit(void* data) {
     unclog_sink_file_data_t* sink = data;
     if (sink->file != NULL) {
         fclose(sink->file);
-        free(sink);
     }
+    free(sink);
 }
 
 static void NOIL unclog_sink_null_init(void** u1, uint32_t u2, unclog_config_value_t* u3) {
