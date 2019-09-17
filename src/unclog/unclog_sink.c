@@ -1,4 +1,4 @@
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 
 #include "unclog_int.h"
 
@@ -60,7 +60,7 @@ static NOIL size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_lis
     return bufferpos - buffer;
 }
 
-static NOIL void unclog_sink_fprintf(const char* buffer) { fprintf(stderr, buffer); }
+static NOIL void unclog_sink_fprintf(const char* buffer) { fprintf(stderr, "%s", buffer); }
 
 static uint64_t unclog_sink_stderr_messages = 0;
 static pthread_mutex_t unclog_sink_stderr_mutex = PTHREAD_MUTEX_INITIALIZER;
