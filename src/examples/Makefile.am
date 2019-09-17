@@ -1,4 +1,4 @@
-AM_CFLAGS = --std=c99 -Wall -Wextra -pedantic -I../unclog -lcunit
+AM_CFLAGS = --std=c99 -Wall -Wextra -pedantic -I../unclog
 
 EXTRA_DIST = unclog.ini
 
