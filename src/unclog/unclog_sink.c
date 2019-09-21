@@ -56,6 +56,7 @@ static NOIL size_t unclog_sink_default(char* buffer, unclog_data_t* data, va_lis
         needsspace = 1;
     }
     *bufferpos++ = '\n';
+    *bufferpos++ = '\0';
 
     return bufferpos - buffer;
 }
